@@ -16,7 +16,7 @@ steps:
   displayName: 'Install Node.js'
 
 - script: |
-    workingDirectory: '$(System.DefaultWorkingDirectory)/client'
     npm install
     npm run build
+    workingDirectory: '$(System.DefaultWorkingDirectory)/client'
   displayName: 'npm install and build'
