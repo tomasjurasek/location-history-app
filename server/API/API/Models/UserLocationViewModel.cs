@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace API.Models
 {
-    public class CreateUser
+    public class UserLocationViewModel
     {
         public string Name { get; set; }
-
+        public ICollection<LocationViewModel> Locations { get; set; }
     }
 }

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.Models
+namespace API
 {
-    public class CreateUser
+    public class CosmosDbOptions
     {
-        public string Name { get; set; }
-
+        public string ConnectionString { get; set; }
     }
 }
