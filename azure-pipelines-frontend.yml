@@ -2,8 +2,7 @@
 # Build a Node.js project that uses Vue.
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
-parameters:
-  displayName: 'Frontend pipeline'
+name: 'Frontend pipeline'
 
 trigger:
 - master
