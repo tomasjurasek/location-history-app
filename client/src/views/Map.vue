@@ -13,18 +13,16 @@
             <MglScaleControl position="bottom-right" />
 
             <MglGeojsonLayer
-                source-id="locationsSource"
-                :source="locationsSource"
-                :layer-id="lineLayer.id"
-                :layer="lineLayer"
-                :clear-source="false"
+                source-id="linesSource"
+                :source="linesSource"
+                :layer-id="linesLayer.id"
+                :layer="linesLayer"
             />
             <MglGeojsonLayer
-                source-id="locationsSource"
-                :source="locationsSource"
+                source-id="pointsSource"
+                :source="pointsSource"
                 :layer-id="pointsLayer.id"
                 :layer="pointsLayer"
-                :clear-source="false"
             />
         </MglMap>
     </div>
@@ -66,7 +64,21 @@ export default class Home extends Vue {
             "accuracy": 33,
         },
     ];
-    locationsSource: Mapbox.GeoJSONSourceRaw = {
+    linesSource: Mapbox.GeoJSONSourceRaw = {
+        type: 'geojson',
+        data: {
+            type: 'FeatureCollection',
+            features: [{
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: this.locations.map(location => [location.longitudeE7 / 10**7, location.latitudeE7 / 10**7]),
+                },
+                properties: {},
+            }],
+        },
+    };
+    pointsSource: Mapbox.GeoJSONSourceRaw = {
         type: 'geojson',
         data: {
             type: 'FeatureCollection',
@@ -85,8 +97,8 @@ export default class Home extends Vue {
             }),
         },
     };
-    lineLayer: Mapbox.Layer = {
-        id: 'lineLayer',
+    linesLayer: Mapbox.Layer = {
+        id: 'linesLayer',
         type: 'line',
         layout: {},
         paint: {
@@ -103,7 +115,7 @@ export default class Home extends Vue {
     };
 
     onLoad() {
-        console.log(this.locationsSource);
+        console.log(this.linesSource, this.pointsSource);
     }
 }
 </script>
