@@ -20,3 +20,12 @@ steps:
     npm run build  
   displayName: 'npm install and build'
   workingDirectory: '$(System.DefaultWorkingDirectory)/client'
+
+- task: CopyFiles@2
+  inputs:
+    contents: '$(System.DefaultWorkingDirectory)/client/dist/**'
+    targetFolder: $(Build.ArtifactStagingDirectory)
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: $(Build.ArtifactStagingDirectory)
+    artifactName: MyBuildOutputs
