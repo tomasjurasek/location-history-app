@@ -6,6 +6,11 @@
             <v-btn class="ma-2">Nahrát</v-btn>
             <v-btn class="ma-2" :to="{ name: 'Instructions' }">Jak připravit data?</v-btn>
         </v-form>
+        <div class="mt-8">
+            <v-btn :to="{ name: 'Map' }">
+                Mapa
+            </v-btn>
+        </div>
     </div>
 </template>
 

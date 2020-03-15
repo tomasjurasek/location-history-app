@@ -12,14 +12,17 @@
   },
   "dependencies": {
     "@mdi/font": "^5.0.45",
+    "mapbox-gl": "^1.8.1",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.2",
+    "vue-mapbox": "^0.4.1",
     "vue-property-decorator": "^8.3.0",
     "vue-router": "^3.1.6",
     "vuetify": "^2.2.11"
   },
   "devDependencies": {
     "@types/jest": "^24.0.19",
+    "@types/mapbox-gl": "^1.8.1",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
     "@vue/cli-plugin-e2e-cypress": "~4.2.0",
