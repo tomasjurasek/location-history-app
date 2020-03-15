@@ -1,7 +1,5 @@
 <template>
     <v-app>
-        <error-dialog v-model="error" />
-
         <v-app-bar app flat height="80">
             <v-toolbar-title>
                 <router-link :to="{ name: 'Home' }">
