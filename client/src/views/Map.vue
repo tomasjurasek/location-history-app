@@ -39,6 +39,8 @@ import Mapbox from 'mapbox-gl';
 // @ts-ignore
 import { MglMap, MglNavigationControl, MglScaleControl, MglGeojsonLayer } from 'vue-mapbox';
 
+import axios from 'axios';
+
 interface Location {
     timestampMs: string;
     latitudeE7: number;
@@ -84,8 +86,9 @@ export default class Home extends Vue {
     }
 
     async loadLocations() {
-        // TODO: load from BE
-        // this.locations = await axios.get(`/api/Users/${this.$route.params.id}/locations`);
+         //this.locations = await axios.get(`/api/Users/${this.$route.params.id}/locations`);
+         this.locations = await axios.get(`/api/users/1/locations`);
+         /*
         this.locations = [
             {
                 "timestampMs": "1517645260330",
@@ -100,6 +103,7 @@ export default class Home extends Vue {
                 "accuracy": 33,
             },
         ];
+        */
         this.linesSource = {
             type: 'geojson',
             data: {
