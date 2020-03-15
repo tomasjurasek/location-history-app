@@ -28,7 +28,9 @@
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+@import '~mapbox-gl/dist/mapbox-gl.css';
+</style>
 
 <script lang="ts">
 import Vue from 'vue';
