@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="cs">
+    <head>
+        <meta charset="utf-8">
+        <title>location-history-app</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div class="container">
+            <h1>Analýza historie polohy z Google</h1>
+            <p>Historii polohy stáhněte z Google podle <a href="/navod">návodu</a>, výsledný soubor je nazvaný např. <em>takeout-20200315T062605Z-001.zip</em>, ten nahrajte zde.</p>
+            <form action="/upload">
+                <div class="custom-file">
+                    <input type="file" name="file" accept=".zip">
+                </div>
+                <btn class="btn btn-primary">Nahrát</btn>
+            </form>
+        </div>
+    </body>
+</html>
