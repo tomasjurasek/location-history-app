@@ -30,7 +30,7 @@ namespace API
         {
             services.AddControllers().AddNewtonsoftJson();
 
-
+            services.AddCors();
             services.AddTransient<GoogleLocationParser>();
             services.AddTransient<UserLocationsService>();
             services.Configure<CosmosDbOptions>(Configuration.GetSection("CosmosDb"));
@@ -50,8 +50,7 @@ namespace API
             app.UseCors(builder => builder
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials());
+                .AllowAnyHeader());
 
             app.UseHttpsRedirection();
             app.UseSwagger();
