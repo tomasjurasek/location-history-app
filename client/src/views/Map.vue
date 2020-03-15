@@ -13,24 +13,24 @@
             <MglScaleControl position="bottom-right" />
 
             <MglGeojsonLayer
-                source-id="locationsSource"
-                :source="locationsSource"
-                :layer-id="lineLayer.id"
-                :layer="lineLayer"
-                :clear-source="false"
+                source-id="linesSource"
+                :source="linesSource"
+                :layer-id="linesLayer.id"
+                :layer="linesLayer"
             />
             <MglGeojsonLayer
-                source-id="locationsSource"
-                :source="locationsSource"
+                source-id="pointsSource"
+                :source="pointsSource"
                 :layer-id="pointsLayer.id"
                 :layer="pointsLayer"
-                :clear-source="false"
             />
         </MglMap>
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+@import '~mapbox-gl/dist/mapbox-gl.css';
+</style>
 
 <script lang="ts">
 import Vue from 'vue';
@@ -38,6 +38,15 @@ import Component from 'vue-class-component';
 import Mapbox from 'mapbox-gl';
 // @ts-ignore
 import { MglMap, MglNavigationControl, MglScaleControl, MglGeojsonLayer } from 'vue-mapbox';
+
+import axios from 'axios';
+
+interface Location {
+    timestampMs: string;
+    latitudeE7: number;
+    longitudeE7: number;
+    accuracy: number;
+}
 
 @Component({
     components: { MglMap, MglNavigationControl, MglScaleControl, MglGeojsonLayer },
@@ -52,41 +61,11 @@ export default class Home extends Vue {
 
     mapbox = Mapbox;
 
-    locations = [
-        {
-            "timestampMs": "1517645260330",
-            "latitudeE7": 500437725,
-            "longitudeE7": 144549068,
-            "accuracy": 96,
-        },
-        {
-            "timestampMs": "1517649982844",
-            "latitudeE7": 500437275,
-            "longitudeE7": 144545330,
-            "accuracy": 33,
-        },
-    ];
-    locationsSource: Mapbox.GeoJSONSourceRaw = {
-        type: 'geojson',
-        data: {
-            type: 'FeatureCollection',
-            features: this.locations.map(location => {
-                return {
-                    type: 'Feature',
-                    geometry: {
-                        type: 'Point',
-                        coordinates: [location.longitudeE7 / 10**7, location.latitudeE7 / 10**7],
-                    },
-                    properties: {
-                        accuracy: location.accuracy,
-                        timestamp: location.timestampMs,
-                    },
-                };
-            }),
-        },
-    };
-    lineLayer: Mapbox.Layer = {
-        id: 'lineLayer',
+    locations: Location[] = [];
+    linesSource: Mapbox.GeoJSONSourceRaw = { type: 'geojson', data: { type: 'FeatureCollection', features: [] }};
+    pointsSource: Mapbox.GeoJSONSourceRaw = { type: 'geojson', data: { type: 'FeatureCollection', features: [] }};
+    linesLayer: Mapbox.Layer = {
+        id: 'linesLayer',
         type: 'line',
         layout: {},
         paint: {
@@ -102,8 +81,68 @@ export default class Home extends Vue {
         },
     };
 
+    mounted() {
+        this.loadLocations();
+    }
+
+    async loadLocations() {
+         //this.locations = await axios.get(`/api/Users/${this.$route.params.id}/locations`);
+         this.locations = await axios.get(`/api/users/1/locations`);
+         /*
+        this.locations = [
+            {
+                "timestampMs": "1517645260330",
+                "latitudeE7": 500437725,
+                "longitudeE7": 144549068,
+                "accuracy": 96,
+            },
+            {
+                "timestampMs": "1517649982844",
+                "latitudeE7": 500437275,
+                "longitudeE7": 144545330,
+                "accuracy": 33,
+            },
+        ];
+        */
+        this.linesSource = {
+            type: 'geojson',
+            data: {
+                type: 'FeatureCollection',
+                features: [{
+                    type: 'Feature',
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: this.locations.map(location => {
+                            return [location.longitudeE7 / 10**7, location.latitudeE7 / 10**7];
+                        }),
+                    },
+                    properties: {},
+                }],
+            },
+        };
+        this.pointsSource = {
+            type: 'geojson',
+            data: {
+                type: 'FeatureCollection',
+                features: this.locations.map(location => {
+                    return {
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [location.longitudeE7 / 10**7, location.latitudeE7 / 10**7],
+                        },
+                        properties: {
+                            accuracy: location.accuracy,
+                            timestamp: location.timestampMs,
+                        },
+                    };
+                }),
+            },
+        };
+    }
+
     onLoad() {
-        console.log(this.locationsSource);
+        console.log(this.linesSource, this.pointsSource);
     }
 }
 </script>
