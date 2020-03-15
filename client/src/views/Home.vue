@@ -1,5 +1,10 @@
 <template>
     <div class="pa-3">
+        <v-alert type="warning" v-if="!$route.params.id">
+            <strong>Chybí ID uživatele!</strong> <br>
+            Prosím, použijte odkaz, který vám přišel do mailu.
+        </v-alert>
+
         <p>Historii polohy stáhněte z Google podle <v-btn text :to="{ name: 'Instructions' }" color="primary">návodu</v-btn>, výsledný soubor je nazvaný např. <em>takeout-20200315T062605Z-001.zip</em>, ten nahrajte zde.</p>
         <v-form>
             <v-file-input accept=".zip" label="Soubor"></v-file-input>
