@@ -32,7 +32,7 @@ namespace API.Controllers
 
             try
             {
-                tempDirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                tempDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", Path.GetRandomFileName());
                 Directory.CreateDirectory(tempDirectoryPath);
 
                 var uploadedFilePath = Path.Combine(tempDirectoryPath, file.FileName);
