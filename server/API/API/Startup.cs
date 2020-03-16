@@ -38,7 +38,8 @@ namespace API
             services.AddCors();
             services.AddTransient<GoogleLocationParser>();
             services.AddTransient<UserLocationsService>();
-            services.Configure<CosmosDbOptions>(Configuration.GetSection("CosmosDb"));
+            services.AddSingleton<AmazonService>();
+            services.Configure<AmazonOptions>(Configuration.GetSection("Amazon"));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Location History API", Version = "v1" });
