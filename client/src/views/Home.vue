@@ -39,7 +39,7 @@ import axios from 'axios';
 
 @Component({})
 export default class Home extends Vue {
-    file: any = null;
+    file!: Blob;
     uploadFailed: Boolean = false;
     loading: Boolean = false;
 

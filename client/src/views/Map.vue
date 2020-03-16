@@ -11,7 +11,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import mapboxgl, {GeoJSONSource} from 'mapbox-gl';
+import mapboxgl from 'mapbox-gl';
 import axios from 'axios';
 
 interface Location {
