@@ -11,7 +11,6 @@ namespace API.Database.Entities
         public UserLocations()
         {
         }
-        public string Name { get; set; }
         public string JsonLocations { get; set; }
     }
 }

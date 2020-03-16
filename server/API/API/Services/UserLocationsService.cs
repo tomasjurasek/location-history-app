@@ -24,22 +24,6 @@ namespace API.Services
             table.CreateIfNotExists();
         }
 
-        public async Task<string> CreateUser(string name)
-        {
-            var userId = Guid.NewGuid().ToString();
-            var userLocations = new UserLocations
-            {
-                PartitionKey = "UserLocations",
-                RowKey = userId,
-                Name = name
-            };
-
-            TableOperation insertOrMergeOperation = TableOperation.InsertOrMerge(userLocations);
-            await table.ExecuteAsync(insertOrMergeOperation);
-           
-            return userId;
-
-        }
 
         public async Task CreateLocations(string userId, string jsonData)
         {

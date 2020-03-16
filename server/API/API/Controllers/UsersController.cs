@@ -7,6 +7,7 @@ using API.Models;
 using API.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace API.Controllers
@@ -15,16 +16,18 @@ namespace API.Controllers
     public partial class UsersController : Controller
     {
         private readonly UserLocationsService locationService;
+        private readonly ILogger<UsersController> logger;
 
-        public UsersController(UserLocationsService locationService)
+        public UsersController(UserLocationsService locationService, ILogger<UsersController> logger)
         {
             this.locationService = locationService;
+            this.logger = logger;
         }
 
         [HttpGet("{userId}/locations")]
         public async Task<IEnumerable<LocationViewModel>> GetAsync(string userId)
         {
-           var locations = await locationService.GetUserLocations(userId);
+            var locations = await locationService.GetUserLocations(userId);
 
             var result = locations.Select(s => new LocationViewModel
             {
@@ -35,13 +38,6 @@ namespace API.Controllers
             });
 
             return result;
-        }
-
-        [HttpPost]
-        public async Task<string> CreateUser([FromBody]CreateUser model)
-        {
-            var userId = await locationService.CreateUser(model?.Name);
-            return userId;
         }
 
         [HttpPost("{userId}/file")]
@@ -73,13 +69,12 @@ namespace API.Controllers
                     System.IO.File.Delete(userFolderPath);
                 }
             }
-
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
+                logger.LogError(ex, nameof(UsersController));
             }
 
             return Ok();
-
         }
     }
 }
