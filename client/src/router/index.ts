@@ -33,7 +33,6 @@ const routes = [
         name: "Instructions",
         component: Instructions
     }
-
 ];
 
 const router = new VueRouter({

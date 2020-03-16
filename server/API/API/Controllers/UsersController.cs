@@ -30,7 +30,7 @@ namespace API.Controllers
             var response = new List<UserLocationViewModel>();
             var usersLocations = locationService.GetUserLocations();
 
-            foreach (var userLocations in usersLocations.GroupBy(s => s.UserIdentifier))
+            foreach (var userLocations in usersLocations.GroupBy(s => s.UserId))
             {
                 response.Add(new UserLocationViewModel
                 {

@@ -15,5 +15,6 @@ namespace API.Database
         }
 
         public DbSet<UserLocations> UsersLocations { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

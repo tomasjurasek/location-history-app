@@ -6,10 +6,10 @@ Vue.use(Vuetify);
 export default new Vuetify({
     theme: {
         options: {
-            customProperties: true,
-        },
+            customProperties: true
+        }
     },
     icons: {
-        iconfont: 'mdi',
-    },
+        iconfont: "mdi"
+    }
 });
