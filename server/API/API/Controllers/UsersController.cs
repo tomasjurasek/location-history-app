@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -8,7 +9,6 @@ using API.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace API.Controllers
 {
@@ -25,43 +25,54 @@ namespace API.Controllers
         }
 
         [HttpPost("{userId}/file")]
-        public async Task<IEnumerable<LocationViewModel>> UploadFileAsync(string userId, [FromForm]IFormFile file)
+        public async Task<IEnumerable<LocationViewModel>> UploadFileAsync(string userId, [FromForm] IFormFile file)
         {
             var response = new List<LocationViewModel>();
+            string tempDirectoryPath = null;
+
             try
             {
-                var userFolderPath = $"{Directory.GetCurrentDirectory()}/wwwroot/{userId}";
-                if (!System.IO.File.Exists(userFolderPath))
+                tempDirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                Directory.CreateDirectory(tempDirectoryPath);
+
+                var uploadedFilePath = Path.Combine(tempDirectoryPath, file.FileName);
+                await using (Stream stream = new FileStream(uploadedFilePath, FileMode.Create))
                 {
-                    Directory.CreateDirectory(userFolderPath);
-
-                   
-                    var filePath = Path.Combine(userFolderPath, file.FileName);
-                    using (System.IO.Stream stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                    }
-
-                    var userFolderDataPath = Directory.CreateDirectory(Path.Combine(userFolderPath, "data"));
-                    ZipFile.ExtractToDirectory(filePath, userFolderDataPath.FullName);
-
-                    var jsonPath = Path.Combine(userFolderDataPath.FullName, "Takeout", "Location History", "Location History.json");
-                    var jsonData = await System.IO.File.ReadAllTextAsync(jsonPath);
-                    var locations = await locationService.CreateUserLocationsAsync(userId, jsonData);
-                    response = locations.Select(s => new LocationViewModel
-                    {
-                        DateTimeUtc = s.DateTimeUtc,
-                        Accuracy = s.Accuracy,
-                        Latitude = s.Latitude,
-                        Longitude = s.Longitude
-                    }).ToList();
-
-                    System.IO.File.Delete(userFolderPath);
+                    await file.CopyToAsync(stream);
                 }
+
+                var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(tempDirectoryPath, "data"));
+                ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
+
+                var jsonPath = Path.Combine(extractedDirectoryPath.FullName, "Takeout", "Location History",
+                    "Location History.json");
+                var jsonData = await System.IO.File.ReadAllTextAsync(jsonPath);
+                var locations = await locationService.CreateUserLocationsAsync(userId, jsonData);
+                response = locations.Select(s => new LocationViewModel
+                {
+                    DateTimeUtc = s.DateTimeUtc,
+                    Accuracy = s.Accuracy,
+                    Latitude = s.Latitude,
+                    Longitude = s.Longitude
+                }).ToList();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 logger.LogError(ex, nameof(UsersController));
+            }
+            finally
+            {
+                try
+                {
+                    if (tempDirectoryPath != null)
+                    {
+                        System.IO.File.Delete(tempDirectoryPath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, nameof(UsersController));
+                }
             }
 
             return response;
