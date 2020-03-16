@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -8,7 +9,6 @@ using API.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace API.Controllers
 {
@@ -24,78 +24,110 @@ namespace API.Controllers
             this.logger = logger;
         }
 
-        [HttpGet("locations")]
-        public Task<List<UserLocationViewModel>> GetUsers()
-        {
-            var response = new List<UserLocationViewModel>();
-            var usersLocations = locationService.GetUserLocations();
-
-            foreach (var userLocations in usersLocations.GroupBy(s => s.UserId))
-            {
-                response.Add(new UserLocationViewModel
-                {
-                    UserIdentifier = userLocations.Key.ToString(),
-                    Locations = userLocations.Select(s => new LocationViewModel
-                    {
-                        DateTimeUtc = s.DateTimeUtc,
-                        Latitude = s.Latitude,
-                        Longitude = s.Longitude,
-                    })
-                    .ToList()
-                });
-
-            }
-
-            return Task.FromResult(response);
-        }
-
-        [HttpGet("{userId}/locations")]
-        public Task<IEnumerable<LocationViewModel>> Get(string userId)
-        {
-            var locations = locationService.GetUserLocations(userId);
-
-            var result = locations.Select(s => new LocationViewModel
-            {
-                DateTimeUtc = s.DateTimeUtc,
-                Latitude = s.Latitude,
-                Longitude = s.Longitude
-            });
-
-            return Task.FromResult(result);
-        }
-
         [HttpPost("{userId}/file")]
-        public async Task<IActionResult> UploadFileAsync(string userId, [FromForm]IFormFile file)
+        public async Task<UserLocationViewModel> UploadFileAsync(string userId, [FromForm] IFormFile file)
         {
+            var response = new UserLocationViewModel();
+            string tempDirectoryPath = null;
+
             try
             {
-                var userFolderPath = $"{Directory.GetCurrentDirectory()}/wwwroot/{userId}";
-                if (!System.IO.File.Exists(userFolderPath))
+                tempDirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                Directory.CreateDirectory(tempDirectoryPath);
+
+                var uploadedFilePath = Path.Combine(tempDirectoryPath, file.FileName);
+                await using (Stream stream = new FileStream(uploadedFilePath, FileMode.Create))
                 {
-                    Directory.CreateDirectory(userFolderPath);
+                    await file.CopyToAsync(stream);
+                }
+                
+                var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(tempDirectoryPath, "data"));
+                ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
 
-                    var filePath = Path.Combine(userFolderPath, file.FileName);
-                    using (System.IO.Stream stream = new FileStream(filePath, FileMode.Create))
+                var jsonData = await GetJsonData(extractedDirectoryPath.FullName);
+                var locations = await locationService.CreateUserLocationsAsync(userId, jsonData);
+                response.Locations = locations.Select(s => new LocationViewModel
+                {
+                    DateTimeUtc = s.DateTimeUtc,
+                    Accuracy = s.Accuracy,
+                    Latitude = s.Latitude,
+                    Longitude = s.Longitude
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Processing of uploaded file failed.");
+            }
+            finally
+            {
+                try
+                {
+                    if (tempDirectoryPath != null)
                     {
-                        await file.CopyToAsync(stream);
+                        Directory.Delete(tempDirectoryPath, true);
                     }
-
-                    var userFolderDataPath = Directory.CreateDirectory(Path.Combine(userFolderPath, "data"));
-                    ZipFile.ExtractToDirectory(filePath, userFolderDataPath.FullName);
-
-                    var jsonPath = Path.Combine(userFolderDataPath.FullName, "Takeout", "Location History", "Location History.json");
-                    var jsonData = await System.IO.File.ReadAllTextAsync(jsonPath);
-                    await locationService.CreateUserLocationsAsync(userId, jsonData);
-
-                    System.IO.File.Delete(userFolderPath);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Deleting of temporary folder '{TempDirectoryPath}' failed.", tempDirectoryPath);
                 }
             }
-            catch (System.Exception ex)
+
+            return response;
+        }
+
+        private static async Task<string> GetJsonData(string directoryPath)
+        {
+            var jsonPathEn = Path.Combine(directoryPath, "Takeout", "Location History", "Location History.json");
+            var jsonPathCz = Path.Combine(directoryPath, "Takeout", "Historie polohy", "Historie polohy.json");
+            string finalJsonPath = null;
+
+            if (System.IO.File.Exists(jsonPathEn))
             {
-                logger.LogError(ex, nameof(UsersController));
+                finalJsonPath = jsonPathEn;
+            }
+            else if (System.IO.File.Exists(jsonPathCz))
+            {
+                finalJsonPath = jsonPathCz;
+            }
+            else
+            {
+                if (!TryGetSingleJsonFile(directoryPath, out finalJsonPath))
+                {
+                    throw new Exception($"JSON file with location history not found in '{directoryPath}'.");
+                }
             }
 
-            return Ok();
+            var jsonData = await System.IO.File.ReadAllTextAsync(finalJsonPath);
+            return jsonData;
+        }
+
+        private static bool TryGetSingleJsonFile(string directoryPath, out string jsonFilePath)
+        {
+            var dir = new DirectoryInfo(directoryPath);
+            var files = dir.EnumerateFiles("*.json", SearchOption.TopDirectoryOnly).ToList();
+            if (files.Count == 1)
+            {
+                jsonFilePath = files.Single().FullName;
+                return true;
+            }
+
+            if (files.Count > 1)
+            {
+                jsonFilePath = default;
+                return false;
+            }
+
+            foreach (var subdir in dir.EnumerateDirectories())
+            {
+                if (TryGetSingleJsonFile(subdir.FullName, out jsonFilePath))
+                {
+                    return true;
+                }
+            }
+
+            jsonFilePath = default;
+            return false;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using static API.Controllers.UsersController;
 
@@ -21,11 +22,13 @@ namespace API.Services
                     DateTimeUtc = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(item.timestampMs)).UtcDateTime,
                     Latitude = item.latitudeE7,
                     Longitude = item.longitudeE7,
-                    LocationSource = LocationSource.Google.ToString()
+                    Accuracy = item.accuracy
                 });
             }
 
-            return response.Where(s => s.DateTimeUtc >= new DateTime(2020, 3, 1));
+            return response
+                .Where(s => s.DateTimeUtc >= new DateTime(2020, 3, 1))
+                .OrderBy(s => s.DateTimeUtc);
         }
     }
 
