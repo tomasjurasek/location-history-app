@@ -25,9 +25,9 @@ namespace API.Controllers
         }
 
         [HttpPost("{userId}/file")]
-        public async Task<IEnumerable<LocationViewModel>> UploadFileAsync(string userId, [FromForm] IFormFile file)
+        public async Task<UserLocationViewModel> UploadFileAsync(string userId, [FromForm] IFormFile file)
         {
-            var response = new List<LocationViewModel>();
+            var response = new UserLocationViewModel();
             string tempDirectoryPath = null;
 
             try
@@ -48,7 +48,7 @@ namespace API.Controllers
                     "Location History.json");
                 var jsonData = await System.IO.File.ReadAllTextAsync(jsonPath);
                 var locations = await locationService.CreateUserLocationsAsync(userId, jsonData);
-                response = locations.Select(s => new LocationViewModel
+                response.Locations = locations.Select(s => new LocationViewModel
                 {
                     DateTimeUtc = s.DateTimeUtc,
                     Accuracy = s.Accuracy,
