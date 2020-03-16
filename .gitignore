@@ -33,3 +33,4 @@ msbuild.wrn
 
 #IntelliJ Idea
 .idea
+/server/API/API/Properties/PublishProfiles

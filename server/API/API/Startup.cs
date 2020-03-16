@@ -47,10 +47,7 @@ namespace API
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseCors(builder => builder
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
+            
 
             app.UseHttpsRedirection();
             app.UseSwagger();
@@ -59,6 +56,11 @@ namespace API
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Location History API");
             });
             app.UseRouting();
+
+            app.UseCors(builder => builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
             app.UseStaticFiles();
             app.UseAuthorization();
 
