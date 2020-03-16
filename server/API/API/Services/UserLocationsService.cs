@@ -1,6 +1,7 @@
 ﻿using API.Database;
 using API.Database.Entities;
 using Microsoft.Azure.Cosmos.Table;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
@@ -26,9 +27,16 @@ namespace API.Services
         {
             var locations = googleLocationParser.Parse(jsonData);
 
+            var user = await dbContext.Users.FirstOrDefaultAsync(s => s.Id == userId);
+            if(user == null)
+            {
+                dbContext.Users.Add(new User { Id = userId });
+                //await dbContext.SaveChangesAsync();
+
+            }
             var usersLocations = locations.Select(s => new UserLocations
             {
-                UserIdentifier = userId,
+                UserId = userId,
                 Latitude = s.Latitude,
                 Longitude = s.Longitude,
                 DateTimeUtc = s.DateTimeUtc
@@ -42,7 +50,7 @@ namespace API.Services
 
         public List<UserLocations> GetUserLocations(string userId)
         {
-            return dbContext.UsersLocations.Where(s => s.UserIdentifier == userId)
+            return dbContext.UsersLocations.Where(s => s.UserId == userId)
                 .ToList();
         }
 
