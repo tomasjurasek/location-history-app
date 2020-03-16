@@ -5,14 +5,19 @@
         </v-col>
         <v-col class="pa-3 overflow-y-auto">
             <v-expansion-panels>
-                <v-expansion-panel v-for="(location, index) in locations" :key="index">
+                <v-expansion-panel
+                    v-for="(location, index) in locations"
+                    :key="index"
+                >
                     <v-expansion-panel-header>
                         {{ location.dateTimeUtc | datetime }}
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                        Souřadnice: {{ location.latitude / 10**7 }}, {{ location.longitude / 10**7 }}
+                        Souřadnice: {{ location.latitude / 10 ** 7 }},
+                        {{ location.longitude / 10 ** 7 }}
                         <br />
-                        Přesnost: {{ location.accuracy ? `${location.accuracy} m` : '-' }}
+                        Přesnost:
+                        {{ location.accuracy ? `${location.accuracy} m` : "-" }}
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -25,8 +30,8 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import {Prop} from "vue-property-decorator";
-import {Location} from "@/types/Location";
+import { Prop } from "vue-property-decorator";
+import { Location } from "@/types/Location";
 
 @Component({})
 export default class LocationHistorySidePanel extends Vue {
