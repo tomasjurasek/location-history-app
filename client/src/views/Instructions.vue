@@ -12,7 +12,8 @@
                             <a
                                 href="https://takeout.google.com/u/0/settings/takeout?pli=1"
                                 target="_blank"
-                            >Google Takeout</a>
+                                >Google Takeout</a
+                            >
                         </h2>
                         <p class="step__description">
                             Klikněte na <strong>Zrušit výběr všech</strong> a
@@ -33,9 +34,12 @@
                 <header class="step__header">
                     <div class="step__number">2.</div>
                     <div>
-                        <h2 class="step__title strong">Nechte formát dat JSON</h2>
+                        <h2 class="step__title strong">
+                            Nechte formát dat JSON
+                        </h2>
                         <p class="step__description">
-                            a na konci stránky klepněte na <strong>pokračovat</strong>.
+                            a na konci stránky klepněte na
+                            <strong>pokračovat</strong>.
                         </p>
                     </div>
                 </header>
@@ -47,11 +51,12 @@
                     <div>
                         <h2 class="step__title">
                             Nechte si odkaz zaslat e-mailem, zvolte exportovat
-                            jednou a klikněte na <strong>Vytvořit export</strong>.
+                            jednou a klikněte na
+                            <strong>Vytvořit export</strong>.
                         </h2>
                         <p class="step__description">
-                            Objeví se následující obrazovka s informací,
-                            že dochází ke stahování.
+                            Objeví se následující obrazovka s informací, že
+                            dochází ke stahování.
                         </p>
                     </div>
                 </header>
@@ -92,7 +97,8 @@
                             se znovu přihlaste svým Google účtem.
                         </h2>
                         <p class="step__description">
-                            Následně se Vám na disk stáhne soubor s názvem (například)
+                            Následně se Vám na disk stáhne soubor s názvem
+                            (například)
                             <code>takeout-20200314T194428Z-001.zip</code>
                         </p>
                     </div>
@@ -126,50 +132,50 @@
 </template>
 
 <style scoped>
-    h1 {
-        margin: 32px 0;
-        font-size: 32px;
-        font-weight: 000;
-        text-align: center;
-    }
+h1 {
+    margin: 32px 0;
+    font-size: 32px;
+    font-weight: 000;
+    text-align: center;
+}
 
-    .step {
-        max-width: 500px;
-        margin: 0 auto;
-    }
+.step {
+    max-width: 500px;
+    margin: 0 auto;
+}
 
-    .step__header {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        margin-top: 32px;
-        margin-bottom: 16px;
-    }
+.step__header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 32px;
+    margin-bottom: 16px;
+}
 
-    .step__number {
-        margin-right: 32px;
-        font-size: 64px;
-        font-weight: 900;
-    }
+.step__number {
+    margin-right: 32px;
+    font-size: 64px;
+    font-weight: 900;
+}
 
-    .step__title {
-        font-size: 14px;
-    }
+.step__title {
+    font-size: 14px;
+}
 
-    .step__title:not(.strong) {
-        font-weight: normal;
-    }
+.step__title:not(.strong) {
+    font-weight: normal;
+}
 
-    .step__description {
-        margin: 0;
-        font-size: 14px;
-        font-weight: normal;
-        opacity: .8;
-    }
+.step__description {
+    margin: 0;
+    font-size: 14px;
+    font-weight: normal;
+    opacity: 0.8;
+}
 
-    .step__image {
-        margin-top: 16px;
-    }
+.step__image {
+    margin-top: 16px;
+}
 </style>
 
 <script lang="ts">

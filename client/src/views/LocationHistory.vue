@@ -23,10 +23,10 @@ import Component from "vue-class-component";
 import axios from "axios";
 import LocationHistoryMap from "@/components/LocationHistoryMap.vue";
 import LocationHistorySidePanel from "@/components/LocationHistorySidePanel.vue";
-import {Location} from "@/types/Location";
+import { Location } from "@/types/Location";
 
 @Component({
-    components: {LocationHistorySidePanel, LocationHistoryMap }
+    components: { LocationHistorySidePanel, LocationHistoryMap }
 })
 export default class LocationHistory extends Vue {
     locations: Location[] = [];

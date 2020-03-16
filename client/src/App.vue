@@ -16,34 +16,34 @@
 </template>
 
 <style scoped>
-    .topbar {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
+.topbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 
-        height: 80px;
-    }
+    height: 80px;
+}
 
-    .logo,
-    .site-title {
-        padding: 0 16px;
-        color: inherit;
-        text-decoration: none;
-    }
+.logo,
+.site-title {
+    padding: 0 16px;
+    color: inherit;
+    text-decoration: none;
+}
 
-    .logo {
-        padding: 8px 24px;
-        margin-left: -12px;
-        line-height: 1.2;
+.logo {
+    padding: 8px 24px;
+    margin-left: -12px;
+    line-height: 1.2;
 
-        font-size: 14px;
-        font-weight: bold;
-        border-right: solid 1px black;
-    }
+    font-size: 14px;
+    font-weight: bold;
+    border-right: solid 1px black;
+}
 
-    .site-title {
-        font-size: 14px;
-    }
+.site-title {
+    font-size: 14px;
+}
 </style>
 
 <script lang="ts">

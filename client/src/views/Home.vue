@@ -11,34 +11,39 @@
                         <strong>Něco se pokazilo!</strong> <br />
                         Prosím, zkuste to znovu.
                     </v-alert>
-                    <h2 class="header__title">Pomozte zjistit historii vaší polohy</h2>
+                    <h2 class="header__title">
+                        Pomozte zjistit historii vaší polohy
+                    </h2>
                     <p class="short-instructions">
                         Historii polohy stáhněte z Google podle
                         <router-link
                             :to="{ name: 'Instructions' }"
                             color="primary"
-                        >návodu</router-link>.<br />
+                            >návodu</router-link
+                        >.<br />
                         Výsledný soubor je nazvaný např.
-                        <strong>takeout-20200315T062605Z-001.zip</strong>, ten nahrajte zde:
+                        <strong>takeout-20200315T062605Z-001.zip</strong>, ten
+                        nahrajte zde:
                     </p>
-                        <v-file-input
-                            class="file-input"
-                            placeholder="Vybrat soubor"
-                            v-model="file"
-                            background-color="white"
-                            hide-details
-                            outlined
-                        ></v-file-input>
-                        <v-btn
-                            class="upload-button"
-                            v-on:click="submitFile()"
-                            :disabled="false && !file"
-                            :loading="loading"
-                            color="success"
-                            x-large
-                            elevation="0"
-                            large
-                        >Nahrát</v-btn>
+                    <v-file-input
+                        class="file-input"
+                        placeholder="Vybrat soubor"
+                        v-model="file"
+                        background-color="white"
+                        hide-details
+                        outlined
+                    ></v-file-input>
+                    <v-btn
+                        class="upload-button"
+                        v-on:click="submitFile()"
+                        :disabled="false && !file"
+                        :loading="loading"
+                        color="success"
+                        x-large
+                        elevation="0"
+                        large
+                        >Nahrát</v-btn
+                    >
                 </v-col>
             </v-row>
         </v-container>
@@ -55,56 +60,56 @@
 </template>
 
 <style scoped>
-    .header {
-        padding-top: 48px;
-        padding-bottom: 48px;
+.header {
+    padding-top: 48px;
+    padding-bottom: 48px;
 
-        background-color: #555555;
-        color: white;
+    background-color: #555555;
+    color: white;
 
-        text-align: center;
-    }
+    text-align: center;
+}
 
-    .header__title {
-        font-size: 32px;
-        font-weight: 500;
-    }
+.header__title {
+    font-size: 32px;
+    font-weight: 500;
+}
 
-    .short-instructions {
-        padding: 24px;
-        font-size: 14px;
-        font-weight: 300;
-    }
+.short-instructions {
+    padding: 24px;
+    font-size: 14px;
+    font-weight: 300;
+}
 
-    .short-instructions a {
-        color: inherit;
-    }
+.short-instructions a {
+    color: inherit;
+}
 
-    .file-input {
-        max-width: 460px;
-        margin: 0 auto !important;
-    }
+.file-input {
+    max-width: 460px;
+    margin: 0 auto !important;
+}
 
-    .file-input /deep/ .v-input__prepend-outer {
-        position: absolute;
-        top: 0;
-        left: 16px;
-        margin-top: 16px;
-        z-index: 100;
-    }
+.file-input /deep/ .v-input__prepend-outer {
+    position: absolute;
+    top: 0;
+    left: 16px;
+    margin-top: 16px;
+    z-index: 100;
+}
 
-    .file-input /deep/ .v-input__prepend-outer button {
-        color: black;
-    }
+.file-input /deep/ .v-input__prepend-outer button {
+    color: black;
+}
 
-    .file-input /deep/ .v-input__slot {
-        padding-left: 5em !important;
-    }
+.file-input /deep/ .v-input__slot {
+    padding-left: 5em !important;
+}
 
-    .upload-button {
-        min-width: 180px !important;
-        margin-top: 16px
-    }
+.upload-button {
+    min-width: 180px !important;
+    margin-top: 16px;
+}
 </style>
 
 <script lang="ts">

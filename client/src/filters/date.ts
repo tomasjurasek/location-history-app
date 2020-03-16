@@ -1,8 +1,8 @@
-import { format as formatFn, parseISO } from 'date-fns';
+import { format as formatFn, parseISO } from "date-fns";
 
 export function date(value?: string) {
     if (value == undefined) {
-        return '';
+        return "";
     }
-    return formatFn(parseISO(value), 'd.M.yyyy');
+    return formatFn(parseISO(value), "d.M.yyyy");
 }

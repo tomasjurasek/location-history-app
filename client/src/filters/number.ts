@@ -1,6 +1,6 @@
 export function number(value?: number) {
     if (value == undefined) {
-        return '';
+        return "";
     }
     return value.toLocaleString();
 }
