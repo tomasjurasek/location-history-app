@@ -1,7 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "@/views/Home.vue";
-import Map from "@/views/Map.vue";
+import LocationHistory from "@/views/LocationHistory.vue";
 import About from "@/views/About.vue";
 import Instructions from "@/views/Instructions.vue";
 
@@ -20,8 +20,8 @@ const routes = [
     },
     {
         path: "/map/:id",
-        name: "Map",
-        component: Map
+        name: "LocationHistory",
+        component: LocationHistory
     },
     {
         path: "/about",

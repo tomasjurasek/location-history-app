@@ -1,7 +1,5 @@
 <template>
-    <div class="pa-3 fill-height">
-        <div ref="map" class="fill-height"></div>
-    </div>
+    <div ref="map" class="fill-height"></div>
 </template>
 
 <style scoped>
@@ -12,7 +10,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import mapboxgl from "mapbox-gl";
-import axios from "axios";
+import {Prop, Watch} from "vue-property-decorator";
 
 interface Location {
     dateTime: string;
@@ -22,58 +20,39 @@ interface Location {
 }
 
 @Component({})
-export default class Home extends Vue {
+export default class LocationHistoryMap extends Vue {
     $refs!: {
         map: HTMLDivElement;
     };
 
     map!: mapboxgl.Map;
+    mapLoaded: boolean = false;
 
-    locations: Location[] = [];
+    @Prop({ default: [] }) locations!: Location[];
 
     async mounted() {
-        await Promise.all([this.loadMap(), this.loadLocations()]);
-        this.renderLocations();
+        this.loadMap();
     }
 
     loadMap() {
-        return new Promise(resolve => {
-            this.map = new mapboxgl.Map({
-                container: this.$refs.map,
-                style: "mapbox://styles/mapbox/streets-v11",
-                accessToken:
-                    "pk.eyJ1IjoiemFramFuIiwiYSI6ImNrMzdzMmtvMzAwdDYzY25jN3Fjc29nbTgifQ.WgBeg8tancmrSs-ld3h1Jw",
-                center: [15.339133, 49.7437],
-                zoom: 7
-            });
-            this.map.addControl(new mapboxgl.NavigationControl(), "top-right");
-            this.map.addControl(new mapboxgl.ScaleControl(), "bottom-right");
-            this.map.on("load", resolve);
+        this.map = new mapboxgl.Map({
+            container: this.$refs.map,
+            style: "https://api.maptiler.com/maps/streets/style.json?key=R1lSouzUdcrAwXeY6zJy",
+            center: [15.339133, 49.7437],
+            zoom: 7
         });
+        this.map.addControl(new mapboxgl.NavigationControl(), "top-right");
+        this.map.addControl(new mapboxgl.ScaleControl(), "bottom-right");
+        this.map.on('load', () => this.mapLoaded = true);
     }
 
-    async loadLocations() {
-        // this.locations = [
-        //     {
-        //         "dateTime": "1517645260330",
-        //         "latitude": 500437725,
-        //         "longitude": 144549068,
-        //         "accuracy": 96,
-        //     },
-        //     {
-        //         "dateTime": "1517649982844",
-        //         "latitude": 500437275,
-        //         "longitude": 144545330,
-        //         "accuracy": 33,
-        //     },
-        // ];
-        const response = await axios.get(
-            `${process.env.VUE_APP_API_URL}/users/${this.$route.params.id}/locations`
-        );
-        this.locations = response.data;
-    }
-
+    @Watch('locations')
     renderLocations() {
+        if (!this.map || !this.mapLoaded) {
+            setTimeout(() => this.renderLocations(), 200);
+            return;
+        }
+
         this.map.addSource("lines", {
             type: "geojson",
             data: {
