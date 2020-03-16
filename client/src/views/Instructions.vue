@@ -1,7 +1,7 @@
 <template>
     <v-row align="center" justify="center" no-gutters>
         <v-col md="7">
-            <h1>Navod jak stáhnout data z Google</h1>
+            <h1>Návod jak stáhnout data z Google</h1>
 
             <section class="step">
                 <header class="step__header">
@@ -130,10 +130,12 @@
         margin: 32px 0;
         font-size: 32px;
         font-weight: 000;
+        text-align: center;
     }
 
     .step {
         max-width: 500px;
+        margin: 0 auto;
     }
 
     .step__header {

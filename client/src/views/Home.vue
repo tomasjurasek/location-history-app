@@ -43,9 +43,7 @@
             </v-row>
         </v-container>
         <v-container>
-            <v-row align="center" justify="center">
-                <Instructions />
-            </v-row>
+            <Instructions />
 
             <div class="mt-8">
                 <v-btn :to="{ name: 'LocationHistory' }">
