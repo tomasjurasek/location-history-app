@@ -25,9 +25,9 @@ namespace API.Controllers
         }
 
         [HttpGet("{userId}/locations")]
-        public async Task<IEnumerable<LocationViewModel>> GetAsync(string userId)
+        public  Task<IEnumerable<LocationViewModel>> Get(string userId)
         {
-            var locations = await locationService.GetUserLocations(userId);
+            var locations = locationService.GetUserLocations(userId);
 
             var result = locations.Select(s => new LocationViewModel
             {
@@ -37,7 +37,7 @@ namespace API.Controllers
                 Longitude = s.Longitude
             });
 
-            return result;
+            return Task.FromResult(result);
         }
 
         [HttpPost("{userId}/file")]
@@ -50,22 +50,19 @@ namespace API.Controllers
                 {
                     Directory.CreateDirectory(userFolderPath);
 
-                    var path = Path.Combine(userFolderPath, file.FileName);
-                    using (System.IO.Stream stream = new FileStream(path, FileMode.Create))
+                    var filePath = Path.Combine(userFolderPath, file.FileName);
+                    using (System.IO.Stream stream = new FileStream(filePath, FileMode.Create))
                     {
                         await file.CopyToAsync(stream);
                     }
 
                     var userFolderDataPath = Directory.CreateDirectory(Path.Combine(userFolderPath, "data"));
-                    ZipFile.ExtractToDirectory(path, userFolderDataPath.FullName);
-                    string jsonPath = Path.Combine(userFolderDataPath.FullName, "Takeout", "Location History", "Location History.json");
+                    ZipFile.ExtractToDirectory(filePath, userFolderDataPath.FullName);
 
-                    var json = System.IO.File.ReadAllText(jsonPath);
+                    var jsonPath = Path.Combine(userFolderDataPath.FullName, "Takeout", "Location History", "Location History.json");
+                    var jsonData = await System.IO.File.ReadAllTextAsync(jsonPath);
+                    await locationService.CreateUserLocationsAsync(userId, jsonData);
 
-                    await locationService.CreateLocations(userId, json);
-
-
-                    System.IO.File.SetAttributes(userFolderPath, FileAttributes.Normal);
                     System.IO.File.Delete(userFolderPath);
                 }
             }
