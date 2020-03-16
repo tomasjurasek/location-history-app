@@ -35,11 +35,12 @@ namespace API.Controllers
                 tempDirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
                 Directory.CreateDirectory(tempDirectoryPath);
 
-                var uploadedFilePath = Path.Combine(tempDirectoryPath, file.FileName);
-                await using (Stream stream = new FileStream(uploadedFilePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
+                //var uploadedFilePath = Path.Combine(tempDirectoryPath, file.FileName);
+                //await using (Stream stream = new FileStream(uploadedFilePath, FileMode.Create))
+                //{
+                //    await file.CopyToAsync(stream);
+                //}
+                var uploadedFilePath = @"c:\Users\lubos\Downloads\takeout-20200316T173441Z-001.zip ";
 
                 var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(tempDirectoryPath, "data"));
                 ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
@@ -64,7 +65,7 @@ namespace API.Controllers
                 {
                     if (tempDirectoryPath != null)
                     {
-                        Directory.Delete(tempDirectoryPath);
+                        Directory.Delete(tempDirectoryPath, true);
                     }
                 }
                 catch (Exception ex)
