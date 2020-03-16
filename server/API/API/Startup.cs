@@ -28,8 +28,8 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddApplicationInsightsTelemetry();
             services.AddControllers().AddNewtonsoftJson();
-
             services.AddCors();
             services.AddTransient<GoogleLocationParser>();
             services.AddTransient<UserLocationsService>();
@@ -61,6 +61,7 @@ namespace API
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
+
             app.UseStaticFiles();
             app.UseAuthorization();
 
