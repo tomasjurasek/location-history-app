@@ -3,10 +3,6 @@
         <v-container class="header">
             <v-row align="center" justify="center" no-gutters>
                 <v-col md="10">
-                    <v-alert type="warning" v-if="!$route.params.id">
-                        <strong>Chybí ID uživatele!</strong> <br />
-                        Prosím, použijte odkaz, který vám přišel do mailu.
-                    </v-alert>
                     <v-alert type="warning" v-if="uploadFailed">
                         <strong>Něco se pokazilo!</strong> <br />
                         Prosím, zkuste to znovu.
@@ -123,14 +119,24 @@ export default class Home extends Vue {
     file: any = null;
     uploadFailed = false;
     loading = false;
+    id : String = this.generateId();
+
+
+    generateId() {
+        return this.rand3Digits() + '-' + this.rand3Digits() + '-' + this.rand3Digits();
+    }
+
+    rand3Digits() {
+        return ("000" + Math.floor((Math.random() * 1000))).slice(-3);
+    }
+
     submitFile() {
         this.uploadFailed = false;
         this.loading = true;
         const formData = new FormData();
         formData.append("file", this.file);
-        axios
-            .post(
-                `${process.env.VUE_APP_API_URL}/users/${this.$route.params.id}/file`,
+        axios.post(
+                `${process.env.VUE_APP_API_URL}/users/${this.id}/file`,
                 formData,
                 {
                     headers: {
@@ -138,14 +144,47 @@ export default class Home extends Vue {
                     }
                 }
             )
-            .then(() => {
+            .then((response) => {
                 this.loading = false;
-                console.log("Hotovo");
+                /*
+                {
+                    "id": "string",
+                     "locations": [
+                        {
+                          "dateTimeUtc": "2020-03-16T19:39:46.393Z",
+                          "longitude": 0,
+                          "latitude": 0,
+                          "accuracy": 0
+                        }
+                      ]
+                 }
+               */
+                localStorage.map = response.data;
+                this.$router.push({ path: 'map' })
             })
             .catch(e => {
                 this.loading = false;
                 console.log("Chybka", e);
-                this.uploadFailed = true;
+                //Use fake data in case of error until backend is ready
+                const locationHistory = {
+                    id: this.id,
+                    locations: [
+                        {
+                            "dateTimeUtc": "20200316T14:00:00Z",
+                            "latitude": 500437725,
+                            "longitude": 144549068,
+                            "accuracy": 96,
+                        },
+                        {
+                            "dateTimeUtc": "20200316T15:00:00Z",
+                            "latitude": 500437275,
+                            "longitude": 144545330,
+                            "accuracy": 33,
+                        },
+                    ]
+                };
+                localStorage.setItem('locationHistory', JSON.stringify(locationHistory));
+                this.$router.push({ path: 'map' })
             });
     }
 }

@@ -14,12 +14,7 @@ const routes = [
         component: Home
     },
     {
-        path: "/:id",
-        name: "Home",
-        component: Home
-    },
-    {
-        path: "/map/:id",
+        path: "/map",
         name: "LocationHistory",
         component: LocationHistory
     },

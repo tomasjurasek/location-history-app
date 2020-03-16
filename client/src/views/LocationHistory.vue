@@ -1,5 +1,22 @@
 <template>
     <v-container class="pa-0">
+        <v-row class="ma2">
+            <v-col cols="9">
+                <v-alert type="success" v-if="id">
+                    <strong>Nahrávání úspěšné, děkujeme!</strong> <br />
+                    Prosím, sdělte pracovníkovi hygienické stanice následující kód:
+                    <h3>{{id}}</h3>
+                </v-alert>
+            </v-col>
+            <v-col cols="3">
+                <v-btn
+                    class="primary ma-2"
+                    x-large
+                    elevation="0"
+                    :href="mailto"
+                    large><v-icon class="mr-2">mdi-email</v-icon> Odeslat mailem</v-btn>
+            </v-col>
+        </v-row>
         <v-row no-gutters class="fill-height-hack">
             <v-col cols="9" class="fill-height">
                 <LocationHistoryMap :locations="locations" />
@@ -20,7 +37,6 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import axios from "axios";
 import LocationHistoryMap from "@/components/LocationHistoryMap.vue";
 import LocationHistorySidePanel from "@/components/LocationHistorySidePanel.vue";
 import { Location } from "@/types/Location";
@@ -30,30 +46,16 @@ import { Location } from "@/types/Location";
 })
 export default class LocationHistory extends Vue {
     locations: Location[] = [];
+    id: String = '';
+    mailto: String = '';
 
     mounted() {
-        this.loadLocations();
-    }
-
-    async loadLocations() {
-        // this.locations = [
-        //     {
-        //         "dateTime": "1517645260330",
-        //         "latitude": 500437725,
-        //         "longitude": 144549068,
-        //         "accuracy": 96,
-        //     },
-        //     {
-        //         "dateTime": "1517649982844",
-        //         "latitude": 500437275,
-        //         "longitude": 144545330,
-        //         "accuracy": 33,
-        //     },
-        // ];
-        const response = await axios.get(
-            `${process.env.VUE_APP_API_URL}/users/${this.$route.params.id}/locations`
-        );
-        this.locations = response.data;
+        if (localStorage.locationHistory) {
+            const locationHistory = JSON.parse(localStorage.locationHistory);
+            this.id = locationHistory.id;
+            this.locations = locationHistory.locations;
+            this.mailto = 'mailto:test@hygiena.cz?subject=Data pro ' + this.id;
+        }
     }
 }
 </script>
