@@ -1,6 +1,7 @@
 ﻿using Amazon;
 using Amazon.S3;
 using Amazon.S3.Transfer;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
@@ -16,28 +17,39 @@ namespace API.Services
     public class AmazonService
     {
         private readonly IOptions<AmazonOptions> amazonOptions;
+        private readonly ILogger<AmazonService> logger;
 
-        public AmazonService(IOptions<AmazonOptions> amazonOptions)
+        public AmazonService(IOptions<AmazonOptions> amazonOptions, ILogger<AmazonService> logger)
         {
             this.amazonOptions = amazonOptions;
+            this.logger = logger;
         }
 
         public async Task UploadCsvData(string userId, IEnumerable<Locations> locations)
         {
-            using (var client = new AmazonS3Client(amazonOptions.Value.Key, amazonOptions.Value.Secret, RegionEndpoint.EUCentral1))
+            try
             {
-                var csvData = ConvertToCsv(userId, locations);
-                var uploadRequest = new TransferUtilityUploadRequest
+                using (var client = new AmazonS3Client(amazonOptions.Value.Key, amazonOptions.Value.Secret, RegionEndpoint.EUCentral1))
                 {
-                    InputStream = GenerateStream(csvData),
-                    Key = $"{userId}.csv",
-                    BucketName = amazonOptions.Value.Bucket,
-                    CannedACL = S3CannedACL.Private
-                };
+                    var csvData = ConvertToCsv(userId, locations);
+                    var uploadRequest = new TransferUtilityUploadRequest
+                    {
+                        InputStream = GenerateStream(csvData),
+                        Key = $"{userId}.csv",
+                        BucketName = amazonOptions.Value.Bucket,
+                        CannedACL = S3CannedACL.Private
+                    };
 
-                var fileTransferUtility = new TransferUtility(client);
-                await fileTransferUtility.UploadAsync(uploadRequest);
+                    var fileTransferUtility = new TransferUtility(client);
+                    await fileTransferUtility.UploadAsync(uploadRequest);
+                }
+
             }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, nameof(UploadCsvData));
+            }
+           
         }
 
         private static string ConvertToCsv(string userId, IEnumerable<Locations> locations)
