@@ -65,8 +65,9 @@ namespace API.Controllers
         }
 
         [HttpPost("{userId}/file")]
-        public async Task<IActionResult> UploadFileAsync(string userId, [FromForm]IFormFile file)
+        public async Task<IEnumerable<LocationViewModel>> UploadFileAsync(string userId, [FromForm]IFormFile file)
         {
+            var response = new List<LocationViewModel>();
             try
             {
                 var userFolderPath = $"{Directory.GetCurrentDirectory()}/wwwroot/{userId}";
@@ -85,7 +86,14 @@ namespace API.Controllers
 
                     var jsonPath = Path.Combine(userFolderDataPath.FullName, "Takeout", "Location History", "Location History.json");
                     var jsonData = await System.IO.File.ReadAllTextAsync(jsonPath);
-                    await locationService.CreateUserLocationsAsync(userId, jsonData);
+                    var locations = await locationService.CreateUserLocationsAsync(userId, jsonData);
+                    response = locations.Select(s => new LocationViewModel
+                    {
+                        DateTimeUtc = s.DateTimeUtc,
+                        Accuracy = s.Accuracy,
+                        Latitude = s.Latitude,
+                        Longitude = s.Longitude
+                    }).ToList();
 
                     System.IO.File.Delete(userFolderPath);
                 }
@@ -95,7 +103,7 @@ namespace API.Controllers
                 logger.LogError(ex, nameof(UsersController));
             }
 
-            return Ok();
+            return response;
         }
     }
 }

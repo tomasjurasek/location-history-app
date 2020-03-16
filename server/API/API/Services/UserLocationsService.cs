@@ -24,13 +24,11 @@ namespace API.Services
             this.amazonService = amazonService;
         }
 
-
-        public async Task CreateUserLocationsAsync(string userId, string jsonData)
+        public async Task<IEnumerable<Locations>> CreateUserLocationsAsync(string userId, string jsonData)
         {
-            var csv = googleLocationParser.ParseToCsv(userId, jsonData);
-            await amazonService.UploadCsvData(userId, csv);
+          
             var locations = googleLocationParser.Parse(jsonData);
-
+            await amazonService.UploadCsvData(userId, locations);
             var user = await dbContext.Users.FirstOrDefaultAsync(s => s.Id == userId);
             if(user == null)
             {
@@ -48,8 +46,7 @@ namespace API.Services
 
             dbContext.UsersLocations.AddRange(usersLocations);
             await dbContext.SaveChangesAsync();
-
-
+            return locations;
         }
 
         public List<UserLocations> GetUserLocations(string userId)
