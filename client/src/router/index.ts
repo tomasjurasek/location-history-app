@@ -8,36 +8,35 @@ import Instructions from "@/views/Instructions.vue";
 Vue.use(VueRouter);
 
 const routes = [
-    {
-        path: "/",
-        name: "Home",
-        component: Home
-    },
-    {
-        path: "/:id",
-        name: "Home",
-        component: Home
-    },
-    {
-        path: "/map/:id",
-        name: "Map",
-        component: Map
-    },
-    {
-        path: "/about",
-        name: "About",
-        component: About
-    },
-    {
-        path: "/instructions",
-        name: "Instructions",
-        component: Instructions
-    }
-
+  {
+    path: "/",
+    name: "Home",
+    component: Home
+  },
+  {
+    path: "/:id",
+    name: "Home",
+    component: Home
+  },
+  {
+    path: "/map/:id",
+    name: "Map",
+    component: Map
+  },
+  {
+    path: "/about",
+    name: "About",
+    component: About
+  },
+  {
+    path: "/instructions",
+    name: "Instructions",
+    component: Instructions
+  }
 ];
 
 const router = new VueRouter({
-    routes
+  routes
 });
 
 export default router;
