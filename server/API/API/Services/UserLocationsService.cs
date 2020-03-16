@@ -44,11 +44,20 @@ namespace API.Services
         public List<Locations> GetUserLocations(string userId)
         {
             var userLocations = table.CreateQuery<UserLocations>()
-                .Where(s => s.PartitionKey == TABLE_NAME && s.RowKey == userId)
+                .Where(s => s.PartitionKey == TABLE_NAME && s.RowKey == userId && s.JsonLocations != null)
                 .FirstOrDefault();
 
             var response = JsonConvert.DeserializeObject<List<Locations>>(userLocations?.JsonLocations);
             return response;
+        }
+
+        public List<UserLocations> GetUserLocations()
+        {
+            var usersLocations = table.CreateQuery<UserLocations>()
+                .Where(s => s.PartitionKey == TABLE_NAME && s.JsonLocations != null)
+                .ToList();
+            
+            return usersLocations;
         }
     }
 }

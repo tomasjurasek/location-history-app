@@ -24,8 +24,27 @@ namespace API.Controllers
             this.logger = logger;
         }
 
+        [HttpGet("locations")]
+        public Task<List<UserLocationViewModel>> GetUsers()
+        {
+            var response = new List<UserLocationViewModel>();
+            var usersLocations = locationService.GetUserLocations();
+
+            foreach (var userLocations in usersLocations)
+            {
+                response.Add(new UserLocationViewModel
+                {
+                    Id = userLocations.RowKey,
+                    Locations = JsonConvert.DeserializeObject<List<LocationViewModel>>(userLocations?.JsonLocations)
+                });
+                
+            }
+
+            return Task.FromResult(response);
+        }
+
         [HttpGet("{userId}/locations")]
-        public  Task<IEnumerable<LocationViewModel>> Get(string userId)
+        public Task<IEnumerable<LocationViewModel>> Get(string userId)
         {
             var locations = locationService.GetUserLocations(userId);
 
