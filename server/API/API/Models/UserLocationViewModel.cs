@@ -8,9 +8,7 @@ namespace API.Models
 {
     public class UserLocationViewModel
     {
-        [JsonProperty("id")]
         public string Id { get; set; }
-        [JsonProperty("locations")]
         public ICollection<LocationViewModel> Locations { get; set; }
     }
 }
