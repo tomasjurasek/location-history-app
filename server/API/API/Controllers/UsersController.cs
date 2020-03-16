@@ -66,7 +66,7 @@ namespace API.Controllers
                 {
                     if (tempDirectoryPath != null)
                     {
-                        System.IO.File.Delete(tempDirectoryPath);
+                        Directory.Delete(tempDirectoryPath);
                     }
                 }
                 catch (Exception ex)
