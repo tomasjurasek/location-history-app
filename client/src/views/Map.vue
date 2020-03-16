@@ -1,30 +1,6 @@
 <template>
     <div class="pa-3 fill-height">
-        <MglMap
-            ref="mglMap"
-            :center="[15.339133, 49.743700]"
-            :zoom="7"
-            :access-token="accessToken"
-            :map-style="mapStyle"
-            :mapbox-gl="mapbox"
-            @load="onLoad"
-        >
-            <MglNavigationControl position="top-right" />
-            <MglScaleControl position="bottom-right" />
-
-            <MglGeojsonLayer
-                source-id="linesSource"
-                :source="linesSource"
-                :layer-id="linesLayer.id"
-                :layer="linesLayer"
-            />
-            <MglGeojsonLayer
-                source-id="pointsSource"
-                :source="pointsSource"
-                :layer-id="pointsLayer.id"
-                :layer="pointsLayer"
-            />
-        </MglMap>
+        <div ref="map" class="fill-height"></div>
     </div>
 </template>
 
@@ -35,10 +11,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import Component from 'vue-class-component';
-import Mapbox from 'mapbox-gl';
-// @ts-ignore
-import { MglMap, MglNavigationControl, MglScaleControl, MglGeojsonLayer } from 'vue-mapbox';
-
+import mapboxgl, {GeoJSONSource} from 'mapbox-gl';
 import axios from 'axios';
 
 interface Location {
@@ -48,90 +21,109 @@ interface Location {
     accuracy: number;
 }
 
-@Component({
-    components: { MglMap, MglNavigationControl, MglScaleControl, MglGeojsonLayer },
-})
+@Component({})
 export default class Home extends Vue {
     $refs!: {
-        mglMap: MglMap;
+        map: HTMLDivElement;
     };
 
-    accessToken = 'pk.eyJ1IjoiemFramFuIiwiYSI6ImNrMzdzMmtvMzAwdDYzY25jN3Fjc29nbTgifQ.WgBeg8tancmrSs-ld3h1Jw';
-    mapStyle = 'mapbox://styles/mapbox/streets-v11';
-
-    mapbox = Mapbox;
+    map!: mapboxgl.Map;
 
     locations: Location[] = [];
-    linesSource: Mapbox.GeoJSONSourceRaw = { type: 'geojson', data: { type: 'FeatureCollection', features: [] }};
-    pointsSource: Mapbox.GeoJSONSourceRaw = { type: 'geojson', data: { type: 'FeatureCollection', features: [] }};
-    linesLayer: Mapbox.Layer = {
-        id: 'linesLayer',
-        type: 'line',
-        layout: {},
-        paint: {
-            'line-color': '#ff0000',
-        },
-    };
-    pointsLayer: Mapbox.Layer = {
-        id: 'pointsLayer',
-        type: 'circle',
-        layout: {},
-        paint: {
-            'circle-color': '#ff0000',
-        },
-    };
 
-    mounted() {
-        this.loadLocations();
+    async mounted() {
+        await Promise.all([this.loadMap(), this.loadLocations()]);
+        this.renderLocations();
+    }
+
+    loadMap() {
+        return new Promise(resolve => {
+            this.map = new mapboxgl.Map({
+                container: this.$refs.map,
+                style: 'mapbox://styles/mapbox/streets-v11',
+                accessToken: 'pk.eyJ1IjoiemFramFuIiwiYSI6ImNrMzdzMmtvMzAwdDYzY25jN3Fjc29nbTgifQ.WgBeg8tancmrSs-ld3h1Jw',
+                center: [15.339133, 49.743700],
+                zoom: 7,
+            });
+            this.map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+            this.map.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+            this.map.on('load', resolve);
+        });
     }
 
     async loadLocations() {
-         let response = await axios.get(`${process.env.VUE_APP_API_URL}/users/${this.$route.params.id}/locations`);
-         this.locations = response.data;
-
-         console.log('locations', this.locations);
-         this.linesSource = {
-             type: 'geojson',
-             data: {
-                 type: 'FeatureCollection',
-                 features: [{
-                     type: 'Feature',
-                     geometry: {
-                         type: 'LineString',
-                         coordinates: this.locations.map(location => {
-                             return [location.longitude / 10**7, location.latitude / 10**7];
-                         }),
-                     },
-                     properties: {},
-                 }],
-             },
-         };
-         this.pointsSource = {
-             type: 'geojson',
-             data: {
-                 type: 'FeatureCollection',
-                 features: this.locations.map(location => {
-                     return {
-                         type: 'Feature',
-                         geometry: {
-                             type: 'Point',
-                             coordinates: [location.longitude / 10**7, location.latitude / 10**7],
-                         },
-                         properties: {
-                             accuracy: location.accuracy,
-                             timestamp: location.dateTime,
-                         },
-                     };
-                 }),
-             },
-         };
-
-         console.log(this.linesSource, this.pointsSource);
-
+        // this.locations = [
+        //     {
+        //         "dateTime": "1517645260330",
+        //         "latitude": 500437725,
+        //         "longitude": 144549068,
+        //         "accuracy": 96,
+        //     },
+        //     {
+        //         "dateTime": "1517649982844",
+        //         "latitude": 500437275,
+        //         "longitude": 144545330,
+        //         "accuracy": 33,
+        //     },
+        // ];
+        let response = await axios.get(`${process.env.VUE_APP_API_URL}/users/${this.$route.params.id}/locations`);
+        this.locations = response.data;
     }
 
-    onLoad() {
-        console.log(this.linesSource, this.pointsSource);
+    renderLocations() {
+        this.map.addSource('lines', {
+            type: 'geojson',
+            data: {
+                type: 'FeatureCollection',
+                features: [{
+                    type: 'Feature',
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: this.locations.map(location => {
+                            return [location.longitude / 10 ** 7, location.latitude / 10 ** 7];
+                        }),
+                    },
+                    properties: {},
+                }],
+            },
+        });
+        this.map.addSource('points', {
+            type: 'geojson',
+            data: {
+                type: 'FeatureCollection',
+                features: this.locations.map(location => {
+                    return {
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [location.longitude / 10 ** 7, location.latitude / 10 ** 7],
+                        },
+                        properties: {
+                            accuracy: location.accuracy,
+                            timestamp: location.dateTime,
+                        },
+                    };
+                }),
+            },
+        });
+        this.map.addLayer({
+            id: 'lines',
+            type: 'line',
+            source: 'lines',
+            layout: {},
+            paint: {
+                'line-color': '#ff0000',
+            },
+        });
+        this.map.addLayer({
+            id: 'points',
+            type: 'circle',
+            source: 'points',
+            layout: {},
+            paint: {
+                'circle-color': '#ff0000',
+            },
+        });
     }
 }
 </script>
