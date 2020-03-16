@@ -11,13 +11,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import mapboxgl from "mapbox-gl";
 import { Prop, Watch } from "vue-property-decorator";
-
-interface Location {
-    dateTime: string;
-    latitude: number;
-    longitude: number;
-    accuracy: number;
-}
+import { Location } from "@/types/Location";
 
 @Component({})
 export default class LocationHistoryMap extends Vue {
@@ -40,7 +34,7 @@ export default class LocationHistoryMap extends Vue {
             style:
                 "https://api.maptiler.com/maps/streets/style.json?key=R1lSouzUdcrAwXeY6zJy",
             center: [15.339133, 49.7437],
-            zoom: 7
+            zoom: 6
         });
         this.map.addControl(new mapboxgl.NavigationControl(), "top-right");
         this.map.addControl(new mapboxgl.ScaleControl(), "bottom-right");
@@ -90,8 +84,8 @@ export default class LocationHistoryMap extends Vue {
                             ]
                         },
                         properties: {
-                            accuracy: location.accuracy,
-                            timestamp: location.dateTime
+                            dateTimeUtc: location.dateTimeUtc,
+                            accuracy: location.accuracy
                         }
                     };
                 })
