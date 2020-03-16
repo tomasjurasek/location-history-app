@@ -35,13 +35,12 @@ namespace API.Controllers
                 tempDirectoryPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
                 Directory.CreateDirectory(tempDirectoryPath);
 
-                //var uploadedFilePath = Path.Combine(tempDirectoryPath, file.FileName);
-                //await using (Stream stream = new FileStream(uploadedFilePath, FileMode.Create))
-                //{
-                //    await file.CopyToAsync(stream);
-                //}
-                var uploadedFilePath = @"c:\Users\lubos\Downloads\takeout-20200316T173441Z-001.zip ";
-
+                var uploadedFilePath = Path.Combine(tempDirectoryPath, file.FileName);
+                await using (Stream stream = new FileStream(uploadedFilePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+                
                 var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(tempDirectoryPath, "data"));
                 ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
 
@@ -57,7 +56,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, nameof(UsersController));
+                logger.LogError(ex, "Processing of uploaded file failed.");
             }
             finally
             {
@@ -70,7 +69,7 @@ namespace API.Controllers
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, nameof(UsersController));
+                    logger.LogError(ex, "Deleting of temporary folder '{TempDirectoryPath}' failed.", tempDirectoryPath);
                 }
             }
 
