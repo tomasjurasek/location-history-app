@@ -15,16 +15,20 @@ namespace API.Services
     {
         private readonly GoogleLocationParser googleLocationParser;
         private readonly LocationHistoryDbContext dbContext;
+        private readonly AmazonService amazonService;
 
-        public UserLocationsService(GoogleLocationParser googleLocationParser, LocationHistoryDbContext dbContext)
+        public UserLocationsService(GoogleLocationParser googleLocationParser, LocationHistoryDbContext dbContext, AmazonService amazonService)
         {
             this.googleLocationParser = googleLocationParser;
             this.dbContext = dbContext;
+            this.amazonService = amazonService;
         }
 
 
         public async Task CreateUserLocationsAsync(string userId, string jsonData)
         {
+            var csv = googleLocationParser.ParseToCsv(userId, jsonData);
+            await amazonService.UploadCsvData(userId, csv);
             var locations = googleLocationParser.Parse(jsonData);
 
             var user = await dbContext.Users.FirstOrDefaultAsync(s => s.Id == userId);

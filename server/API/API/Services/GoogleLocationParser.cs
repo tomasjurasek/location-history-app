@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using static API.Controllers.UsersController;
 
@@ -26,6 +27,25 @@ namespace API.Services
             }
 
             return response.Where(s => s.DateTimeUtc >= new DateTime(2020, 3, 1));
+        }
+
+        public string ParseToCsv(string userId, string json)
+        {
+            var jsonData = JsonConvert.DeserializeObject<GoogleRootObject>(json);
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine($"id,date,longitude,latitude,accuracy");
+
+            foreach (var item in jsonData.Locations)
+            {
+                var date = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(item.timestampMs)).UtcDateTime;
+                if(date >= new DateTime(2020, 3, 1) 
+                    && date <= new DateTime(2020, 5, 1))
+                {
+                    stringBuilder.AppendLine($"{userId},{date},{item.longitudeE7},{item.latitudeE7},{item.accuracy}");
+                }
+            }
+
+            return stringBuilder.ToString();
         }
     }
 
