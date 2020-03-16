@@ -1,7 +1,7 @@
 <template>
-  <div class="pa-3">
-    <h1>O aplikaci</h1>
-  </div>
+    <div class="pa-3">
+        <h1>O aplikaci</h1>
+    </div>
 </template>
 
 <style scoped></style>
