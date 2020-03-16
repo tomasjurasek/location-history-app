@@ -1,19 +1,13 @@
 <template>
     <v-app>
-        <v-app-bar app flat height="80">
-            <v-toolbar-title>
-                <router-link :to="{ name: 'Home' }">
-                    <v-icon class="mr-3">mdi-medical-bag</v-icon>
-                    <span class="secondary--text">Analýza historie polohy</span>
-                </router-link>
-            </v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-toolbar-items>
-                <v-btn text icon :to="{ name: 'About' }">
-                    <v-icon>mdi-information</v-icon>
-                </v-btn>
-            </v-toolbar-items>
-        </v-app-bar>
+        <v-container class="topbar">
+            <router-link :to="{ name: 'Home' }" class="logo">
+                GLOBAL<br />PROJECT
+            </router-link>
+            <router-link :to="{ name: 'Home' }" class="site-title">
+                Google Location History
+            </router-link>
+        </v-container>
 
         <v-content>
             <router-view />
@@ -22,14 +16,34 @@
 </template>
 
 <style scoped>
-.v-app-bar a {
-    text-decoration: none;
-}
+    .topbar {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
 
-.v-app-bar img {
-    vertical-align: middle;
-    margin-right: 8px;
-}
+        height: 80px;
+    }
+
+    .logo,
+    .site-title {
+        padding: 0 16px;
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .logo {
+        padding: 8px 24px;
+        margin-left: -12px;
+        line-height: 1.2;
+
+        font-size: 14px;
+        font-weight: bold;
+        border-right: solid 1px black;
+    }
+
+    .site-title {
+        font-size: 14px;
+    }
 </style>
 
 <script lang="ts">
