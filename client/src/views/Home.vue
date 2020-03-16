@@ -11,14 +11,9 @@
                         Pomozte zjistit historii vaší polohy
                     </h2>
                     <p class="short-instructions">
-                        Historii polohy stáhněte z Google podle
-                        <router-link
-                            :to="{ name: 'Instructions' }"
-                            color="primary"
-                            >návodu</router-link
-                        >.<br />
-                        Výsledný soubor je nazvaný např.
-                        <strong>takeout-20200315T062605Z-001.zip</strong>, ten
+                        Historii polohy stáhněte z Google podle návodu .<br />
+                        Výsledný soubor (nazvaný např.
+                        <strong>takeout-20200315T062605Z-001.zip</strong>)
                         nahrajte zde:
                     </p>
                     <v-file-input

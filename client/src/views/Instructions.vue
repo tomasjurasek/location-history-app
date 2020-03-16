@@ -111,22 +111,6 @@
                     />
                 </v-sheet>
             </section>
-
-            <section class="step">
-                <header class="step__header">
-                    <div class="step__number">6.</div>
-                    <div>
-                        <h2 class="step__title">Nahrajte soubor</h2>
-                        <p class="step__description">
-                            Tento soubor nahrajte na
-                            <router-link :to="{ name: 'Home' }"
-                                >úvodní stránce</router-link
-                            >
-                            Děkujeme!
-                        </p>
-                    </div>
-                </header>
-            </section>
         </v-col>
     </v-row>
 </template>
