@@ -23,7 +23,7 @@ namespace API.Services
 
         public async Task UploadCsvData(string userId, string csvData)
         {
-            using (var client = new AmazonS3Client(amazonOptions.Value.Key, amazonOptions.Value.Secret, RegionEndpoint.USEast1))
+            using (var client = new AmazonS3Client(amazonOptions.Value.Key, amazonOptions.Value.Secret, RegionEndpoint.EUCentral1))
             {
                 var uploadRequest = new TransferUtilityUploadRequest
                 {
