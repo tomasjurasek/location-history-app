@@ -10,7 +10,7 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import mapboxgl from "mapbox-gl";
-import {Prop, Watch} from "vue-property-decorator";
+import { Prop, Watch } from "vue-property-decorator";
 
 interface Location {
     dateTime: string;
@@ -26,7 +26,7 @@ export default class LocationHistoryMap extends Vue {
     };
 
     map!: mapboxgl.Map;
-    mapLoaded: boolean = false;
+    mapLoaded = false;
 
     @Prop({ default: [] }) locations!: Location[];
 
@@ -37,16 +37,17 @@ export default class LocationHistoryMap extends Vue {
     loadMap() {
         this.map = new mapboxgl.Map({
             container: this.$refs.map,
-            style: "https://api.maptiler.com/maps/streets/style.json?key=R1lSouzUdcrAwXeY6zJy",
+            style:
+                "https://api.maptiler.com/maps/streets/style.json?key=R1lSouzUdcrAwXeY6zJy",
             center: [15.339133, 49.7437],
             zoom: 7
         });
         this.map.addControl(new mapboxgl.NavigationControl(), "top-right");
         this.map.addControl(new mapboxgl.ScaleControl(), "bottom-right");
-        this.map.on('load', () => this.mapLoaded = true);
+        this.map.on("load", () => (this.mapLoaded = true));
     }
 
-    @Watch('locations')
+    @Watch("locations")
     renderLocations() {
         if (!this.map || !this.mapLoaded) {
             setTimeout(() => this.renderLocations(), 200);
