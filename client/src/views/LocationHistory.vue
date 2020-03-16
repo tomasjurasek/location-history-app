@@ -1,26 +1,32 @@
 <template>
-    <div class="pa-3 fill-height">
-        <LocationHistoryMap :locations="locations" />
-    </div>
+    <v-container class="pa-0">
+        <v-row no-gutters class="fill-height-hack">
+            <v-col cols="9" class="fill-height">
+                <LocationHistoryMap :locations="locations" />
+            </v-col>
+            <v-col cols="3" class="fill-height">
+                <LocationHistorySidePanel :locations="locations" />
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
-<style scoped></style>
+<style scoped>
+.fill-height-hack {
+    height: calc(100vh - 80px);
+}
+</style>
 
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
 import axios from "axios";
 import LocationHistoryMap from "@/components/LocationHistoryMap.vue";
-
-interface Location {
-    dateTime: string;
-    latitude: number;
-    longitude: number;
-    accuracy: number;
-}
+import LocationHistorySidePanel from "@/components/LocationHistorySidePanel.vue";
+import {Location} from "@/types/Location";
 
 @Component({
-    components: { LocationHistoryMap }
+    components: {LocationHistorySidePanel, LocationHistoryMap }
 })
 export default class LocationHistory extends Vue {
     locations: Location[] = [];
