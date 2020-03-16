@@ -40,9 +40,7 @@ export default class Home extends Vue {
         return new Promise(resolve => {
             this.map = new mapboxgl.Map({
                 container: this.$refs.map,
-                style: "mapbox://styles/mapbox/streets-v11",
-                accessToken:
-                    "pk.eyJ1IjoiemFramFuIiwiYSI6ImNrMzdzMmtvMzAwdDYzY25jN3Fjc29nbTgifQ.WgBeg8tancmrSs-ld3h1Jw",
+                style: "https://api.maptiler.com/maps/streets/style.json?key=R1lSouzUdcrAwXeY6zJy",
                 center: [15.339133, 49.7437],
                 zoom: 7
             });
