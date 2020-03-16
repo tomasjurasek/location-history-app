@@ -42,9 +42,9 @@ import { MglMap, MglNavigationControl, MglScaleControl, MglGeojsonLayer } from '
 import axios from 'axios';
 
 interface Location {
-    timestampMs: string;
-    latitudeE7: number;
-    longitudeE7: number;
+    dateTime: string;
+    latitude: number;
+    longitude: number;
     accuracy: number;
 }
 
@@ -86,59 +86,48 @@ export default class Home extends Vue {
     }
 
     async loadLocations() {
-         //this.locations = await axios.get(`/api/Users/${this.$route.params.id}/locations`);
-         this.locations = await axios.get(`/api/users/1/locations`);
-         /*
-        this.locations = [
-            {
-                "timestampMs": "1517645260330",
-                "latitudeE7": 500437725,
-                "longitudeE7": 144549068,
-                "accuracy": 96,
-            },
-            {
-                "timestampMs": "1517649982844",
-                "latitudeE7": 500437275,
-                "longitudeE7": 144545330,
-                "accuracy": 33,
-            },
-        ];
-        */
-        this.linesSource = {
-            type: 'geojson',
-            data: {
-                type: 'FeatureCollection',
-                features: [{
-                    type: 'Feature',
-                    geometry: {
-                        type: 'LineString',
-                        coordinates: this.locations.map(location => {
-                            return [location.longitudeE7 / 10**7, location.latitudeE7 / 10**7];
-                        }),
-                    },
-                    properties: {},
-                }],
-            },
-        };
-        this.pointsSource = {
-            type: 'geojson',
-            data: {
-                type: 'FeatureCollection',
-                features: this.locations.map(location => {
-                    return {
-                        type: 'Feature',
-                        geometry: {
-                            type: 'Point',
-                            coordinates: [location.longitudeE7 / 10**7, location.latitudeE7 / 10**7],
-                        },
-                        properties: {
-                            accuracy: location.accuracy,
-                            timestamp: location.timestampMs,
-                        },
-                    };
-                }),
-            },
-        };
+         let response = await axios.get(`${process.env.VUE_APP_API_URL}/users/${this.$route.params.id}/locations`);
+         this.locations = response.data;
+
+         console.log('locations', this.locations);
+         this.linesSource = {
+             type: 'geojson',
+             data: {
+                 type: 'FeatureCollection',
+                 features: [{
+                     type: 'Feature',
+                     geometry: {
+                         type: 'LineString',
+                         coordinates: this.locations.map(location => {
+                             return [location.longitude / 10**7, location.latitude / 10**7];
+                         }),
+                     },
+                     properties: {},
+                 }],
+             },
+         };
+         this.pointsSource = {
+             type: 'geojson',
+             data: {
+                 type: 'FeatureCollection',
+                 features: this.locations.map(location => {
+                     return {
+                         type: 'Feature',
+                         geometry: {
+                             type: 'Point',
+                             coordinates: [location.longitude / 10**7, location.latitude / 10**7],
+                         },
+                         properties: {
+                             accuracy: location.accuracy,
+                             timestamp: location.dateTime,
+                         },
+                     };
+                 }),
+             },
+         };
+
+         console.log(this.linesSource, this.pointsSource);
+
     }
 
     onLoad() {
