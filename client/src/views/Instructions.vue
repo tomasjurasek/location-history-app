@@ -1,161 +1,174 @@
 <template>
-    <v-col class="col-5">
-        <v-row align="center" justify="center">
-            <h1>Navod jak stahnut data z Google</h1>
-        </v-row>
+    <v-row align="center" justify="center" no-gutters>
+        <v-col md="7">
+            <h1>Navod jak stáhnout data z Google</h1>
 
-        <v-row align="center" justify="center">
-            <v-col align="center" justify="center">
-                <v-row align="center">
-                    <v-col>
-                        <h1>1.</h1>
-                    </v-col>
-                    <v-col>
-                        <h2>Přihlaste se do Google Takeout</h2>
-                        <p>
+            <section class="step">
+                <header class="step__header">
+                    <div class="step__number">1.</div>
+                    <div>
+                        <h2 class="step__title strong">
+                            Přihlaste se do
                             <a
                                 href="https://takeout.google.com/u/0/settings/takeout?pli=1"
                                 target="_blank"
-                                >https://takeout.google.com/u/0/settings/takeout?pli=1</a
-                            ><br />
+                            >Google Takeout</a>
+                        </h2>
+                        <p class="step__description">
                             Klikněte na <strong>Zrušit výběr všech</strong> a
                             vyberte pouze historii polohy.
                         </p>
-                    </v-col>
-                </v-row>
-                <v-row align="center" justify="end">
-                    <v-sheet color="white">
-                        <v-img
-                            src="instructions/instructions1.png"
-                            max-width="500"
-                            class="elevation-4"
-                        />
-                    </v-sheet>
-                </v-row>
-            </v-col>
-        </v-row>
+                    </div>
+                </header>
+                <v-sheet class="step__image" color="white">
+                    <v-img
+                        src="instructions/instructions1.png"
+                        max-width="500"
+                        class="elevation-4"
+                    />
+                </v-sheet>
+            </section>
 
-        <v-row align="center" justify="center">
-            <v-col align="center" justify="center">
-                <v-row align="center">
-                    <v-col>
-                        <h1>2.</h1>
-                    </v-col>
-                    <v-col>
-                        <p>
-                            Nechte formát dat JSON a na konci stránky klepněte
-                            na
-                            <strong>pokračovat</strong>.
+            <section class="step">
+                <header class="step__header">
+                    <div class="step__number">2.</div>
+                    <div>
+                        <h2 class="step__title strong">Nechte formát dat JSON</h2>
+                        <p class="step__description">
+                            a na konci stránky klepněte na <strong>pokračovat</strong>.
                         </p>
-                    </v-col>
-                </v-row>
-                <v-row align="center" justify="end">
-                    <v-sheet class="pa-12" color="white">
-                        <v-img
-                            src="instructions/instructions2.png"
-                            max-width="500"
-                            class="elevation-4"
-                        />
-                        <br />
-                    </v-sheet>
-                </v-row>
-            </v-col>
-        </v-row>
+                    </div>
+                </header>
+            </section>
 
-        <v-row align="center" justify="center">
-            <v-col align="center" justify="center">
-                <v-row align="center">
-                    <v-col>
-                        <h1>3.</h1>
-                    </v-col>
-                    <v-col>
-                        <p>
+            <section class="step">
+                <header class="step__header">
+                    <div class="step__number">3.</div>
+                    <div>
+                        <h2 class="step__title">
                             Nechte si odkaz zaslat e-mailem, zvolte exportovat
-                            jednou a klikněte na
-                            <strong>Vytvořit export</strong>. Objeví se
-                            následující obrazovka s informací, že dochází ke
-                            stahování.
+                            jednou a klikněte na <strong>Vytvořit export</strong>.
+                        </h2>
+                        <p class="step__description">
+                            Objeví se následující obrazovka s informací,
+                            že dochází ke stahování.
                         </p>
-                    </v-col>
-                </v-row>
-                <v-row align="center" justify="end">
-                    <v-sheet class="pa-12" color="white">
-                        <v-img
-                            src="instructions/instructions3.png"
-                            max-width="500"
-                            class="elevation-4"
-                        />
-                    </v-sheet>
-                </v-row>
-            </v-col>
-        </v-row>
+                    </div>
+                </header>
+                <v-sheet class="step__image" color="white">
+                    <v-img
+                        src="instructions/instructions3.png"
+                        max-width="500"
+                        class="elevation-4"
+                    />
+                </v-sheet>
+            </section>
 
-        <v-row align="center" justify="center">
-            <v-col align="center" justify="center">
-                <v-row align="center">
-                    <v-col>
-                        <h1>4.</h1>
-                    </v-col>
-                    <v-col>
-                        <h2>Čekejte</h2>
-                        <p>
-                            Po několika minutách se objeví následující
-                            obrazovka:
+            <section class="step">
+                <header class="step__header">
+                    <div class="step__number">4.</div>
+                    <div>
+                        <h2 class="step__title">Čekejte</h2>
+                        <p class="step__description">
+                            Po několika minutách se objeví následující obrazovka
                         </p>
-                    </v-col>
-                </v-row>
-                <v-row align="center" justify="end">
-                    <v-sheet class="pa-12" color="white">
-                        <v-img
-                            src="instructions/instructions4.png"
-                            max-width="500"
-                            class="elevation-4"
-                        />
-                    </v-sheet>
-                </v-row>
-            </v-col>
-        </v-row>
+                    </div>
+                </header>
+                <v-sheet class="step__image" color="white">
+                    <v-img
+                        src="instructions/instructions4.png"
+                        max-width="500"
+                        class="elevation-4"
+                    />
+                </v-sheet>
+            </section>
 
-        <v-row align="center" justify="center">
-            <v-col align="center" justify="center">
-                <v-row align="center">
-                    <v-col>
-                        <h1>5.</h1>
-                    </v-col>
-                    <v-col>
-                        <p>
+            <section class="step">
+                <header class="step__header">
+                    <div class="step__number">5.</div>
+                    <div>
+                        <h2 class="step__title">
                             Klepněte na <strong>Stáhnout</strong> a pro ověření
-                            se znovu přihlaste svým Google účtem. Následně se
-                            Vám na disk stáhne soubor s názvem (například)
+                            se znovu přihlaste svým Google účtem.
+                        </h2>
+                        <p class="step__description">
+                            Následně se Vám na disk stáhne soubor s názvem (například)
                             <code>takeout-20200314T194428Z-001.zip</code>
                         </p>
-                    </v-col>
-                </v-row>
-            </v-col>
-        </v-row>
-        <v-row align="center" justify="center">
-            <v-col align="center" justify="space-around">
-                <v-row align="center">
-                    <v-col>
-                        <h1>6.</h1>
-                    </v-col>
-                    <v-col>
-                        <h2>Nahrajte soubor</h2>
-                        <p>
+                    </div>
+                </header>
+                <v-sheet class="step__image" color="white">
+                    <v-img
+                        src="instructions/instructions5.png"
+                        max-width="500"
+                        class="elevation-4"
+                    />
+                </v-sheet>
+            </section>
+
+            <section class="step">
+                <header class="step__header">
+                    <div class="step__number">6.</div>
+                    <div>
+                        <h2 class="step__title">Nahrajte soubor</h2>
+                        <p class="step__description">
                             Tento soubor nahrajte na
                             <router-link :to="{ name: 'Home' }"
                                 >úvodní stránce</router-link
                             >
                             Děkujeme!
                         </p>
-                    </v-col>
-                </v-row>
-            </v-col>
-        </v-row>
-    </v-col>
+                    </div>
+                </header>
+            </section>
+        </v-col>
+    </v-row>
 </template>
 
-<style scoped></style>
+<style scoped>
+    h1 {
+        margin: 32px 0;
+        font-size: 32px;
+        font-weight: 000;
+    }
+
+    .step {
+        max-width: 500px;
+    }
+
+    .step__header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-top: 32px;
+        margin-bottom: 16px;
+    }
+
+    .step__number {
+        margin-right: 32px;
+        font-size: 64px;
+        font-weight: 900;
+    }
+
+    .step__title {
+        font-size: 14px;
+    }
+
+    .step__title:not(.strong) {
+        font-weight: normal;
+    }
+
+    .step__description {
+        margin: 0;
+        font-size: 14px;
+        font-weight: normal;
+        opacity: .8;
+    }
+
+    .step__image {
+        margin-top: 16px;
+    }
+</style>
 
 <script lang="ts">
 import Vue from "vue";
