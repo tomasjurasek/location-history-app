@@ -46,7 +46,7 @@
         </v-container>
 
         <div class="mt-8">
-            <v-btn :to="{ name: 'Map' }">
+            <v-btn :to="{ name: 'LocationHistory' }">
                 Mapa
             </v-btn>
         </div>
