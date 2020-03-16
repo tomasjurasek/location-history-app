@@ -24,46 +24,6 @@ namespace API.Controllers
             this.logger = logger;
         }
 
-        [HttpGet("locations")]
-        public Task<List<UserLocationViewModel>> GetUsers()
-        {
-            var response = new List<UserLocationViewModel>();
-            var usersLocations = locationService.GetUserLocations();
-
-            foreach (var userLocations in usersLocations.GroupBy(s => s.UserId))
-            {
-                response.Add(new UserLocationViewModel
-                {
-                    UserIdentifier = userLocations.Key.ToString(),
-                    Locations = userLocations.Select(s => new LocationViewModel
-                    {
-                        DateTimeUtc = s.DateTimeUtc,
-                        Latitude = s.Latitude,
-                        Longitude = s.Longitude,
-                    })
-                    .ToList()
-                });
-
-            }
-
-            return Task.FromResult(response);
-        }
-
-        [HttpGet("{userId}/locations")]
-        public Task<IEnumerable<LocationViewModel>> Get(string userId)
-        {
-            var locations = locationService.GetUserLocations(userId);
-
-            var result = locations.Select(s => new LocationViewModel
-            {
-                DateTimeUtc = s.DateTimeUtc,
-                Latitude = s.Latitude,
-                Longitude = s.Longitude
-            });
-
-            return Task.FromResult(result);
-        }
-
         [HttpPost("{userId}/file")]
         public async Task<IEnumerable<LocationViewModel>> UploadFileAsync(string userId, [FromForm]IFormFile file)
         {
@@ -75,6 +35,7 @@ namespace API.Controllers
                 {
                     Directory.CreateDirectory(userFolderPath);
 
+                   
                     var filePath = Path.Combine(userFolderPath, file.FileName);
                     using (System.IO.Stream stream = new FileStream(filePath, FileMode.Create))
                     {
