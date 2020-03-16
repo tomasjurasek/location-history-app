@@ -26,7 +26,9 @@ namespace API.Services
                 });
             }
 
-            return response.Where(s => s.DateTimeUtc >= new DateTime(2020, 3, 1));
+            return response
+                .Where(s => s.DateTimeUtc >= new DateTime(2020, 3, 1))
+                .OrderBy(s => s.DateTimeUtc);
         }
 
         public string ParseToCsv(string userId, string json)
