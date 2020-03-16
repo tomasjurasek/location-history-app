@@ -12,17 +12,13 @@ namespace API.Services
 {
     public class UserLocationsService
     {
-        private readonly CloudTable table;
         private readonly GoogleLocationParser googleLocationParser;
-        private const string TABLE_NAME = "UserLocations";
+        private readonly LocationHistoryDbContext dbContext;
 
-        public UserLocationsService(GoogleLocationParser googleLocationParser, IOptions<CosmosDbOptions> cosmosDbOptions)
+        public UserLocationsService(GoogleLocationParser googleLocationParser, LocationHistoryDbContext dbContext)
         {
             this.googleLocationParser = googleLocationParser;
-            var storageAccount = CloudStorageAccount.Parse(cosmosDbOptions.Value.ConnectionString);
-            var cloudTableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
-            table = cloudTableClient.GetTableReference(TABLE_NAME);
-            table.CreateIfNotExists();
+            this.dbContext = dbContext;
         }
 
 
@@ -30,34 +26,30 @@ namespace API.Services
         {
             var locations = googleLocationParser.Parse(jsonData);
 
-            var userLocations = new UserLocations
+            var usersLocations = locations.Select(s => new UserLocations
             {
-                PartitionKey = TABLE_NAME,
-                RowKey = userId,
-                JsonLocations = JsonConvert.SerializeObject(locations)
-            };
+                UserIdentifier = userId,
+                Latitude = s.Latitude,
+                Longitude = s.Longitude,
+                DateTimeUtc = s.DateTimeUtc
+            });
 
-            TableOperation insertOrMergeOperation = TableOperation.InsertOrMerge(userLocations);
-            await table.ExecuteAsync(insertOrMergeOperation);
+            dbContext.UsersLocations.AddRange(usersLocations);
+            await dbContext.SaveChangesAsync();
+
+
         }
 
-        public List<Locations> GetUserLocations(string userId)
+        public List<UserLocations> GetUserLocations(string userId)
         {
-            var userLocations = table.CreateQuery<UserLocations>()
-                .Where(s => s.PartitionKey == TABLE_NAME && s.RowKey == userId && s.JsonLocations != null)
-                .FirstOrDefault();
-
-            var response = JsonConvert.DeserializeObject<List<Locations>>(userLocations?.JsonLocations);
-            return response;
+            return dbContext.UsersLocations.Where(s => s.UserIdentifier == userId)
+                .ToList();
         }
 
         public List<UserLocations> GetUserLocations()
         {
-            var usersLocations = table.CreateQuery<UserLocations>()
-                .Where(s => s.PartitionKey == TABLE_NAME && s.JsonLocations != null)
+            return dbContext.UsersLocations
                 .ToList();
-            
-            return usersLocations;
         }
     }
 }

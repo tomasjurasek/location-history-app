@@ -30,14 +30,20 @@ namespace API.Controllers
             var response = new List<UserLocationViewModel>();
             var usersLocations = locationService.GetUserLocations();
 
-            foreach (var userLocations in usersLocations)
+            foreach (var userLocations in usersLocations.GroupBy(s => s.UserIdentifier))
             {
                 response.Add(new UserLocationViewModel
                 {
-                    Id = userLocations.RowKey,
-                    Locations = JsonConvert.DeserializeObject<List<LocationViewModel>>(userLocations?.JsonLocations)
+                    UserIdentifier = userLocations.Key.ToString(),
+                    Locations = userLocations.Select(s => new LocationViewModel
+                    {
+                        DateTimeUtc = s.DateTimeUtc,
+                        Latitude = s.Latitude,
+                        Longitude = s.Longitude,
+                    })
+                    .ToList()
                 });
-                
+
             }
 
             return Task.FromResult(response);
@@ -51,7 +57,6 @@ namespace API.Controllers
             var result = locations.Select(s => new LocationViewModel
             {
                 DateTimeUtc = s.DateTimeUtc,
-                Accuracy = s.Accuracy,
                 Latitude = s.Latitude,
                 Longitude = s.Longitude
             });

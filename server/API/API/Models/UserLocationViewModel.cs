@@ -8,7 +8,7 @@ namespace API.Models
 {
     public class UserLocationViewModel
     {
-        public string Id { get; set; }
+        public string UserIdentifier { get; set; }
         public ICollection<LocationViewModel> Locations { get; set; }
     }
 }

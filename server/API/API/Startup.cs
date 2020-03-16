@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,6 +30,10 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddApplicationInsightsTelemetry();
+            services.AddDbContext<LocationHistoryDbContext>(options =>
+            {
+                options.UseNpgsql(Configuration.GetConnectionString("Postgresql"));
+            });
             services.AddControllers().AddNewtonsoftJson();
             services.AddCors();
             services.AddTransient<GoogleLocationParser>();

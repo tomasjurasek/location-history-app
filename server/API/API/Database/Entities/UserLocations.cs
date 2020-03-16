@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace API.Database.Entities
 {
-    public class UserLocations : TableEntity
+    public class UserLocations 
     {
-        public UserLocations()
-        {
-        }
-        public string JsonLocations { get; set; }
+        public Guid Id { get; set; }
+        public string UserIdentifier { get; set; }
+        public DateTime DateTimeUtc { get; set; }
+        public int Longitude { get; set; }
+        public int Latitude { get; set; }
     }
 }
