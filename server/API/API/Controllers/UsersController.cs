@@ -31,7 +31,7 @@ namespace API.Controllers
 
         [HttpPost("{userId}/file")]
         [RequestSizeLimit(104857600)]
-        [RequestFormLimits(MultipartBodyLengthLimit = 104857600)]
+        //[RequestFormLimits(MultipartBodyLengthLimit = 104857600)]
         public async Task<ActionResult<UserLocationViewModel>> UploadFileAsync(string userId, [FromForm] IFormFile file)
         {
             var response = new UserLocationViewModel
@@ -67,19 +67,19 @@ namespace API.Controllers
                     await file.CopyToAsync(stream);
                 }
 
-                var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(tempDirectoryPath, "data"));
-                ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
+                //var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(tempDirectoryPath, "data"));
+                //ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
 
-                var jsonData = await GetJsonData(extractedDirectoryPath.FullName);
+                //var jsonData = await GetJsonData(extractedDirectoryPath.FullName);
 
-                var locations = await locationService.CreateUserLocationsAsync(userId, jsonData);
-                response.Locations = locations.Select(s => new LocationViewModel
-                {
-                    DateTimeUtc = s.DateTimeUtc,
-                    Accuracy = s.Accuracy,
-                    Latitude = s.Latitude,
-                    Longitude = s.Longitude
-                }).ToList();
+                //var locations = await locationService.CreateUserLocationsAsync(userId, jsonData);
+                //response.Locations = locations.Select(s => new LocationViewModel
+                //{
+                //    DateTimeUtc = s.DateTimeUtc,
+                //    Accuracy = s.Accuracy,
+                //    Latitude = s.Latitude,
+                //    Longitude = s.Longitude
+                //}).ToList();
             }
             catch (Exception ex)
             {
@@ -88,18 +88,18 @@ namespace API.Controllers
             }
             finally
             {
-                try
-                {
-                    if (tempDirectoryPath != null)
-                    {
-                        Directory.Delete(tempDirectoryPath, true);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // throw new Exception($"Deleting of temporary folder '{tempDirectoryPath}' failed.", ex);
-                    logger.LogError(ex, $"Deleting of temporary folder '{tempDirectoryPath}' failed.");
-                }
+                //try
+                //{
+                //    if (tempDirectoryPath != null)
+                //    {
+                //        Directory.Delete(tempDirectoryPath, true);
+                //    }
+                //}
+                //catch (Exception ex)
+                //{
+                //    // throw new Exception($"Deleting of temporary folder '{tempDirectoryPath}' failed.", ex);
+                //    logger.LogError(ex, $"Deleting of temporary folder '{tempDirectoryPath}' failed.");
+                //}
             }
 
             return response;

@@ -37,6 +37,7 @@ namespace API
             services.AddTransient<GoogleLocationParser>();
             services.AddTransient<UserLocationsService>();
             services.AddSingleton<AmazonService>();
+            services.AddHostedService<FileParseService>();
             services.Configure<AmazonOptions>(Configuration.GetSection("Amazon"));
             services.AddSwaggerGen(c =>
             {
