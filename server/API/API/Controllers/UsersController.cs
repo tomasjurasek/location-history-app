@@ -47,6 +47,7 @@ namespace API.Controllers
                 ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
 
                 var jsonData = await GetJsonData(extractedDirectoryPath.FullName);
+
                 var locations = await locationService.CreateUserLocationsAsync(userId, jsonData);
                 response.Locations = locations.Select(s => new LocationViewModel
                 {
@@ -78,11 +79,11 @@ namespace API.Controllers
             return response;
         }
 
-        private static async Task<string> GetJsonData(string directoryPath)
+        private async Task<string> GetJsonData(string directoryPath)
         {
             var jsonPathEn = Path.Combine(directoryPath, "Takeout", "Location History", "Location History.json");
             var jsonPathCz = Path.Combine(directoryPath, "Takeout", "Historie polohy", "Historie polohy.json");
-            string finalJsonPath = null;
+            string finalJsonPath;
 
             if (System.IO.File.Exists(jsonPathEn))
             {
@@ -104,7 +105,7 @@ namespace API.Controllers
             return jsonData;
         }
 
-        private static bool TryGetSingleJsonFile(string directoryPath, out string jsonFilePath)
+        private bool TryGetSingleJsonFile(string directoryPath, out string jsonFilePath)
         {
             var dir = new DirectoryInfo(directoryPath);
             var files = dir.EnumerateFiles("*.json", SearchOption.TopDirectoryOnly).ToList();
