@@ -11,6 +11,8 @@ namespace API
 {
     public class Startup
     {
+        private const string OriginsName = "allowAllOrigins";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -24,13 +26,21 @@ namespace API
             services.AddApplicationInsightsTelemetry();
             services.AddControllers().AddNewtonsoftJson();
             services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy(OriginsName,
+                    builder => builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+            });
             services.AddTransient<GoogleLocationParser>();
             services.AddTransient<UserLocationsService>();
             services.AddSingleton<AmazonService>();
             services.Configure<AmazonOptions>(Configuration.GetSection("Amazon"));
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Location History API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Location History API", Version = "v1"});
             });
         }
 
@@ -41,28 +51,19 @@ namespace API
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+
 
             app.UseHttpsRedirection();
             app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Location History API");
-            });
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Location History API"); });
             app.UseRouting();
 
-            app.UseCors(builder => builder
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
+            app.UseCors(OriginsName);
 
             //app.UseStaticFiles();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }
