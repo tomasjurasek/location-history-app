@@ -57,17 +57,12 @@ namespace API
                 app.UseDeveloperExceptionPage();
             }
 
-
             app.UseHttpsRedirection();
             app.UseSwagger();
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Location History API"); });
             app.UseRouting();
-
             app.UseCors(OriginsName);
-
-            //app.UseStaticFiles();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
