@@ -44,6 +44,7 @@ namespace API.Controllers
 
         [HttpPost("file")]
         [RequestSizeLimit(104857600)]
+        [RequestFormLimits(MultipartBodyLengthLimit = 104857600)]
         public async Task<ActionResult<UserLocationViewModel>> UploadFileAsync([FromForm] IFormFile file)
         {
             var userId = Guid.NewGuid().ToString();
