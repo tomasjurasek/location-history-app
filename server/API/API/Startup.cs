@@ -1,7 +1,7 @@
+using API.ServiceBus;
 using API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -38,6 +38,10 @@ namespace API
             services.AddTransient<GoogleLocationParser>();
             services.AddTransient<UserLocationsService>();
             services.AddSingleton<AmazonService>();
+            services.AddHostedService<FileParseBackgroundService>();
+            services.AddSingleton<LocationCreatedSender>();
+            services.AddSingleton<LocationCreatedReceiver>();
+            services.AddSingleton<AzureBlobService>();
             services.Configure<AmazonOptions>(Configuration.GetSection("Amazon"));
             services.AddSwaggerGen(c =>
             {
