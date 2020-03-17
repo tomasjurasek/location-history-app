@@ -100,6 +100,7 @@ namespace API.Services
                     await userLocationsService.CreateUserLocationsAsync(userId, jsonData);
 
                     Directory.Delete(folderPath, true);
+                    await azureBlobService.DeleteFile(userId);
                 }
             }
         }
