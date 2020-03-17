@@ -8,6 +8,7 @@ using API.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace API.Controllers
@@ -18,19 +19,39 @@ namespace API.Controllers
         private readonly UserLocationsService locationService;
         private readonly ILogger<UsersController> logger;
         private readonly IWebHostEnvironment env;
+        private readonly IConfiguration config;
 
-        public UsersController(UserLocationsService locationService, ILogger<UsersController> logger, IWebHostEnvironment env)
+        public UsersController(UserLocationsService locationService, ILogger<UsersController> logger, IWebHostEnvironment env, IConfiguration config)
         {
             this.locationService = locationService;
             this.logger = logger;
             this.env = env;
+            this.config = config;
         }
 
         [HttpPost("{userId}/file")]
-        public async Task<UserLocationViewModel> UploadFileAsync(string userId, [FromForm] IFormFile file)
+        public async Task<ActionResult<UserLocationViewModel>> UploadFileAsync(string userId, [FromForm] IFormFile file)
         {
-            var response = new UserLocationViewModel();
+            var response = new UserLocationViewModel
+            {
+                Id = userId
+            };
             string tempDirectoryPath = null;
+
+            if (file == null)
+            {
+                return BadRequest("No file has been uploaded.");
+            }
+
+            if(!IsFileContentTypeValid(file))
+            {
+                return BadRequest("File must be a zip.");
+            }
+
+            if (!IsFileLengthValid(file))
+            {
+                return BadRequest("File size exceeded configured limit.");
+            }
 
             try
             {
@@ -59,7 +80,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Processing of uploaded file failed.");
+                throw new Exception("Processing of uploaded file failed.", ex);
             }
             finally
             {
@@ -72,11 +93,28 @@ namespace API.Controllers
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Deleting of temporary folder '{TempDirectoryPath}' failed.", tempDirectoryPath);
+                    throw new Exception($"Deleting of temporary folder '{tempDirectoryPath}' failed.", ex);
                 }
             }
 
             return response;
+        }
+
+        private bool IsFileLengthValid(IFormFile file)
+        {
+            var maxMaxUploadedFileLength = config.GetValue<long>("MaxUploadedFileLength");
+            if (maxMaxUploadedFileLength == default)
+            {
+                throw new Exception("Missing configuration of 'MaxUploadedFileLength'.");
+            }
+
+
+            return file.Length <= maxMaxUploadedFileLength;
+        }
+
+        private bool IsFileContentTypeValid(IFormFile file)
+        {
+            return file.ContentType == "application/zip";
         }
 
         private async Task<string> GetJsonData(string directoryPath)
