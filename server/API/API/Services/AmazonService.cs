@@ -43,13 +43,11 @@ namespace API.Services
                     var fileTransferUtility = new TransferUtility(client);
                     await fileTransferUtility.UploadAsync(uploadRequest);
                 }
-
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, nameof(UploadCsvData));
             }
-           
         }
 
         private static string ConvertToCsv(string userId, IEnumerable<Locations> locations)

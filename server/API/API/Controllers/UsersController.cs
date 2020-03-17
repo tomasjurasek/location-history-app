@@ -52,7 +52,6 @@ namespace API.Controllers
 
             try
             {
-                //var userFolderPath = $"{Directory.GetCurrentDirectory()}/wwwroot/{userId}";
                 tempDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", $"{userId}");
                 Directory.CreateDirectory(tempDirectoryPath);
 
@@ -107,11 +106,6 @@ namespace API.Controllers
 
 
             return file.Length <= maxMaxUploadedFileLength;
-        }
-
-        private bool IsFileContentTypeValid(IFormFile file)
-        {
-            return file.ContentType == "application/zip";
         }
 
         private string GetJsonFilePath(string directoryPath)
