@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 
-namespace API.ServiceBus
+namespace API.Services.ServiceBus
 {
     public class LocationCreatedSender : ServiceBusSender
     {

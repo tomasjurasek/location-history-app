@@ -36,7 +36,6 @@ namespace API.Services
         }
     }
 
-
     public class GoogleRootObject
     {
         [JsonProperty("locations")] public List<GoogleLocation> Locations { get; set; }

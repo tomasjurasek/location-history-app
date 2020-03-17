@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.ServiceBus
+namespace API.Services.ServiceBus
 {
     public class LocationsCreatedMessage
     {
