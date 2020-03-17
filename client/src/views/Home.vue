@@ -154,7 +154,7 @@ export default class Home extends Vue {
                       ]
                  }
                */
-                localStorage.map = response.data;
+                localStorage.setItem('locationHistory', JSON.stringify(response.data));
                 this.$router.push({ path: 'map' })
             })
             .catch(e => {
