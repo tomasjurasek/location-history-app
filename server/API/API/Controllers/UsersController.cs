@@ -32,7 +32,10 @@ namespace API.Controllers
         [HttpPost("{userId}/file")]
         public async Task<ActionResult<UserLocationViewModel>> UploadFileAsync(string userId, [FromForm] IFormFile file)
         {
-            var response = new UserLocationViewModel();
+            var response = new UserLocationViewModel
+            {
+                Id = userId
+            };
             string tempDirectoryPath = null;
 
             if (file == null)
@@ -40,7 +43,12 @@ namespace API.Controllers
                 return BadRequest("No file has been uploaded.");
             }
 
-            if (IsFileLengthValid(file))
+            if(!IsFileContentTypeValid(file))
+            {
+                return BadRequest("File must be a zip.");
+            }
+
+            if (!IsFileLengthValid(file))
             {
                 return BadRequest("File size exceeded configured limit.");
             }
@@ -102,6 +110,11 @@ namespace API.Controllers
 
 
             return file.Length <= maxMaxUploadedFileLength;
+        }
+
+        private bool IsFileContentTypeValid(IFormFile file)
+        {
+            return file.ContentType == "application/zip";
         }
 
         private async Task<string> GetJsonData(string directoryPath)
