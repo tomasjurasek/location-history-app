@@ -34,7 +34,7 @@ namespace API.Controllers
 
             try
             {
-                tempDirectoryPath = Path.Combine(env.WebRootPath, Path.GetRandomFileName());
+                tempDirectoryPath = Path.Combine(env.WebRootPath, $"{userId}");
                 Directory.CreateDirectory(tempDirectoryPath);
 
                 var uploadedFilePath = Path.Combine(tempDirectoryPath, file.FileName);
