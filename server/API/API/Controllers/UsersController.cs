@@ -52,7 +52,8 @@ namespace API.Controllers
 
             try
             {
-                tempDirectoryPath = Path.Combine(env.WebRootPath, $"{userId}");
+                //var userFolderPath = $"{Directory.GetCurrentDirectory()}/wwwroot/{userId}";
+                tempDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", $"{userId}");
                 Directory.CreateDirectory(tempDirectoryPath);
 
                 var uploadedFilePath = Path.Combine(tempDirectoryPath, file.FileName);
