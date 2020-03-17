@@ -32,12 +32,8 @@ namespace API.Controllers
         [HttpPost("{userId}/file")]
         [RequestSizeLimit(104857600)]
         [RequestFormLimits(MultipartBodyLengthLimit = 104857600)]
-        public async Task<ActionResult<UserLocationViewModel>> UploadFileAsync(string userId, [FromForm] IFormFile file)
+        public async Task<ActionResult<string>> UploadFileAsync(string userId, [FromForm] IFormFile file)
         {
-            var response = new UserLocationViewModel
-            {
-                Id = userId
-            };
             string tempDirectoryPath = null;
 
             if (file == null)
@@ -52,7 +48,6 @@ namespace API.Controllers
 
             try
             {
-                //var userFolderPath = $"{Directory.GetCurrentDirectory()}/wwwroot/{userId}";
                 tempDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", $"{userId}");
                 Directory.CreateDirectory(tempDirectoryPath);
 
@@ -62,39 +57,13 @@ namespace API.Controllers
                     await file.CopyToAsync(stream);
                 }
 
-                var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(tempDirectoryPath, "data"));
-                ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
-
-                var jsonFilePath = GetJsonFilePath(extractedDirectoryPath.FullName);
-                var locations = await locationService.CreateUserLocationsAsync(userId, jsonFilePath);
-                response.Locations = locations.Select(s => new LocationViewModel
-                {
-                    DateTimeUtc = s.DateTimeUtc,
-                    Accuracy = s.Accuracy,
-                    Latitude = s.Latitude,
-                    Longitude = s.Longitude
-                }).ToList();
             }
             catch (Exception ex)
             {
-                throw new Exception("Processing of uploaded file failed.", ex);
-            }
-            finally
-            {
-                try
-                {
-                    if (tempDirectoryPath != null)
-                    {
-                        Directory.Delete(tempDirectoryPath, true);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "Deleting of temporary folder '{TempDirectoryPath}' failed. Exception: {Exception}.", tempDirectoryPath, ex.ToString());
-                }
+                logger.LogError(ex, "Processing of uploaded file failed.");
             }
 
-            return response;
+            return userId;
         }
 
         private bool IsFileLengthValid(IFormFile file)
@@ -105,64 +74,7 @@ namespace API.Controllers
                 throw new Exception("Missing configuration of 'MaxUploadedFileLength'.");
             }
 
-
             return file.Length <= maxMaxUploadedFileLength;
-        }
-
-        private bool IsFileContentTypeValid(IFormFile file)
-        {
-            return file.ContentType == "application/zip";
-        }
-
-        private string GetJsonFilePath(string directoryPath)
-        {
-            var jsonPathEn = Path.Combine(directoryPath, "Takeout", "Location History", "Location History.json");
-            var jsonPathCz = Path.Combine(directoryPath, "Takeout", "Historie polohy", "Historie polohy.json");
-
-            if (System.IO.File.Exists(jsonPathEn))
-            {
-                return jsonPathEn;
-            }
-
-            if (System.IO.File.Exists(jsonPathCz))
-            {
-                return jsonPathCz;
-            }
-
-            if (!TryGetSingleJsonFile(directoryPath, out var finalJsonPath))
-            {
-                throw new Exception($"JSON file with location history not found in '{directoryPath}'.");
-            }
-
-            return finalJsonPath;
-        }
-
-        private bool TryGetSingleJsonFile(string directoryPath, out string jsonFilePath)
-        {
-            var dir = new DirectoryInfo(directoryPath);
-            var files = dir.EnumerateFiles("*.json", SearchOption.TopDirectoryOnly).ToList();
-            if (files.Count == 1)
-            {
-                jsonFilePath = files.Single().FullName;
-                return true;
-            }
-
-            if (files.Count > 1)
-            {
-                jsonFilePath = default;
-                return false;
-            }
-
-            foreach (var subdir in dir.EnumerateDirectories())
-            {
-                if (TryGetSingleJsonFile(subdir.FullName, out jsonFilePath))
-                {
-                    return true;
-                }
-            }
-
-            jsonFilePath = default;
-            return false;
         }
     }
 }
