@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Models;
 using API.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -17,11 +17,13 @@ namespace API.Controllers
     {
         private readonly UserLocationsService locationService;
         private readonly ILogger<UsersController> logger;
+        private readonly IWebHostEnvironment env;
 
-        public UsersController(UserLocationsService locationService, ILogger<UsersController> logger)
+        public UsersController(UserLocationsService locationService, ILogger<UsersController> logger, IWebHostEnvironment env)
         {
             this.locationService = locationService;
             this.logger = logger;
+            this.env = env;
         }
 
         [HttpPost("{userId}/file")]
@@ -32,7 +34,7 @@ namespace API.Controllers
 
             try
             {
-                tempDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", Path.GetRandomFileName());
+                tempDirectoryPath = Path.Combine(env.WebRootPath, Path.GetRandomFileName());
                 Directory.CreateDirectory(tempDirectoryPath);
 
                 var uploadedFilePath = Path.Combine(tempDirectoryPath, file.FileName);
@@ -40,7 +42,7 @@ namespace API.Controllers
                 {
                     await file.CopyToAsync(stream);
                 }
-                
+
                 var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(tempDirectoryPath, "data"));
                 ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
 
