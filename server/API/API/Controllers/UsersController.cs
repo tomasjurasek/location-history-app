@@ -37,10 +37,11 @@ namespace API.Controllers
             this.locationCreatedSender = locationCreatedSender;
         }
 
-        [HttpPost("{userId}/file")]
+        [HttpPost("file")]
         [RequestSizeLimit(104857600)]
-        public async Task<ActionResult<UserLocationViewModel>> UploadFileAsync(string userId, [FromForm] IFormFile file)
+        public async Task<ActionResult<UserLocationViewModel>> UploadFileAsync([FromForm] IFormFile file)
         {
+            var userId = Guid.NewGuid().ToString();
             var response = new UserLocationViewModel
             {
                 Id = userId
