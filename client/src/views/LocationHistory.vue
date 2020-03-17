@@ -40,18 +40,19 @@ import Component from "vue-class-component";
 import LocationHistoryMap from "@/components/LocationHistoryMap.vue";
 import LocationHistorySidePanel from "@/components/LocationHistorySidePanel.vue";
 import { Location } from "@/types/Location";
+import { locationHistoryStorage } from "@/services/LocationHistoryStorage";
 
 @Component({
     components: { LocationHistorySidePanel, LocationHistoryMap }
 })
 export default class LocationHistory extends Vue {
     locations: Location[] = [];
-    id: String = '';
-    mailto: String = '';
+    id: string = '';
+    mailto: string = '';
 
     mounted() {
-        if (localStorage.locationHistory) {
-            const locationHistory = JSON.parse(localStorage.locationHistory);
+        const locationHistory = locationHistoryStorage.load();
+        if (locationHistory) {
             this.id = locationHistory.id;
             this.locations = locationHistory.locations;
             this.mailto = 'mailto:test@hygiena.cz?subject=Data pro ' + this.id;

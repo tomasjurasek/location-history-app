@@ -108,13 +108,14 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import axios from "axios";
 import Instructions from "./Instructions.vue";
+import { locationHistoryStorage } from "@/services/LocationHistoryStorage";
 
 @Component({ components: { Instructions } })
 export default class Home extends Vue {
     file: any = null;
     uploadFailed = false;
     loading = false;
-    id : String = this.generateId();
+    id: string = this.generateId();
 
 
     generateId() {
@@ -154,7 +155,7 @@ export default class Home extends Vue {
                       ]
                  }
                */
-                localStorage.setItem('locationHistory', JSON.stringify(response.data));
+                locationHistoryStorage.save(response.data);
                 this.$router.push({ path: 'map' })
             })
             .catch(e => {
@@ -178,7 +179,7 @@ export default class Home extends Vue {
                         },
                     ]
                 };
-                localStorage.setItem('locationHistory', JSON.stringify(locationHistory));
+                locationHistoryStorage.save(locationHistory);
                 this.$router.push({ path: 'map' })
             });
     }
