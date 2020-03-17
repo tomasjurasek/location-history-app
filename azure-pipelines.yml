@@ -8,6 +8,8 @@ name: 'Backend pipeline'
 trigger:
 - master
 
+pr: none
+
 pool:
   vmImage: 'windows-latest'
 
