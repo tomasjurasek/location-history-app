@@ -1,12 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.IO.Compression;
-using System.Linq;
 using System.Threading.Tasks;
 using API.Models;
-using API.ServiceBus;
 using API.Services;
-using Microsoft.AspNetCore.Hosting;
+using API.Services.ServiceBus;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;

@@ -1,5 +1,4 @@
-﻿using API.ServiceBus;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
@@ -12,12 +11,14 @@ namespace API.Services.ServiceBus
 {
     public class LocationCreatedReceiver : ServiceBusReceiver
     {
+        private readonly ILogger<ServiceBusReceiver> logger;
         private readonly UserLocationsService userLocationsService;
         private readonly AzureBlobService azureBlobService;
 
         public LocationCreatedReceiver(IConfiguration configuration, ILogger<ServiceBusReceiver> logger,
             UserLocationsService userLocationsService, AzureBlobService azureBlobService) : base(configuration, logger)
         {
+            this.logger = logger;
             this.userLocationsService = userLocationsService;
             this.azureBlobService = azureBlobService;
         }
@@ -25,29 +26,37 @@ namespace API.Services.ServiceBus
         protected override async Task ProcessEventAsync(LocationsCreatedMessage message, CancellationToken cancellationToken)
         {
             var userId = message.UserId;
-            using (var stream = await azureBlobService.DownloadFile(userId))
+            try
             {
-                if (stream != null)
+                using (var stream = await azureBlobService.DownloadFile(userId))
                 {
-                    stream.Position = 0;
-                    var folderPath = Path.Combine(Directory.GetCurrentDirectory(), userId);
-                    Directory.CreateDirectory(Path.Combine(folderPath));
-                    var uploadedFilePath = Path.Combine(folderPath, Path.GetRandomFileName());
-                    await using (Stream fileStream = new FileStream(uploadedFilePath, FileMode.Create))
+                    if (stream != null)
                     {
-                        await stream.CopyToAsync(fileStream);
+                        stream.Position = 0;
+                        var folderPath = Path.Combine(Directory.GetCurrentDirectory(), userId);
+                        Directory.CreateDirectory(Path.Combine(folderPath));
+                        var uploadedFilePath = Path.Combine(folderPath, Path.GetRandomFileName());
+                        await using (Stream fileStream = new FileStream(uploadedFilePath, FileMode.Create))
+                        {
+                            await stream.CopyToAsync(fileStream);
+                        }
+
+                        var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(folderPath, "data"));
+                        ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
+
+                        var jsonData = GetJsonFilePath(extractedDirectoryPath.FullName);
+                        await userLocationsService.CreateUserLocationsAsync(userId, jsonData);
+
+                        Directory.Delete(folderPath, true);
+                        await azureBlobService.DeleteFile(userId);
                     }
-
-                    var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(folderPath, "data"));
-                    ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
-
-                    var jsonData = GetJsonFilePath(extractedDirectoryPath.FullName);
-                    await userLocationsService.CreateUserLocationsAsync(userId, jsonData);
-
-                    Directory.Delete(folderPath, true);
-                    await azureBlobService.DeleteFile(userId);
                 }
             }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Processing failed for user - {userId}");
+            }
+            
         }
 
         private string GetJsonFilePath(string directoryPath)
