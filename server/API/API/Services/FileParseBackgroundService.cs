@@ -14,11 +14,13 @@ namespace API.Services
     {
         private readonly UserLocationsService userLocationsService;
         private readonly ILogger<FileParseBackgroundService> logger;
+        private readonly AzureBlobService azureBlobService;
 
-        public FileParseBackgroundService(UserLocationsService userLocationsService, ILogger<FileParseBackgroundService> logger)
+        public FileParseBackgroundService(UserLocationsService userLocationsService, ILogger<FileParseBackgroundService> logger, AzureBlobService azureBlobService)
         {
             this.userLocationsService = userLocationsService;
             this.logger = logger;
+            this.azureBlobService = azureBlobService;
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -27,26 +29,53 @@ namespace API.Services
                 await Task.Delay(10000);
                 try
                 {
-                    var folders = Directory.GetDirectories(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"));
-                    foreach (var folder in folders)
+
+                    using (var stream = await azureBlobService.DownloadFile("333"))
                     {
-                        var file = Directory.GetFiles(folder).FirstOrDefault();
-                        var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(folder, "data"));
-                        ZipFile.ExtractToDirectory(file, extractedDirectoryPath.FullName);
+                        if (stream != null)
+                        {
+                            stream.Position = 0;
+                            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "333");
+                            Directory.CreateDirectory(Path.Combine(folderPath));
+                            var uploadedFilePath = Path.Combine(folderPath, Path.GetRandomFileName());
+                            await using (Stream fileStream = new FileStream(uploadedFilePath, FileMode.Create))
+                            {
+                                await stream.CopyToAsync(fileStream);
+                            }
 
-                        var jsonData = GetJsonFilePath(extractedDirectoryPath.FullName);
-                        var userId = new DirectoryInfo(folder).Name;
-                        await userLocationsService.CreateUserLocationsAsync(userId, jsonData);
+                            var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(folderPath, "data"));
+                            ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
 
-                        Directory.Delete(folder, true);
+                            var jsonData = GetJsonFilePath(extractedDirectoryPath.FullName);
+                            var userId = new DirectoryInfo(uploadedFilePath).Name;
+                            await userLocationsService.CreateUserLocationsAsync(userId, jsonData);
+
+                            Directory.Delete(folderPath, true);
+                        }
                     }
+
+                    
+
+                    //var folders = Directory.GetDirectories(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"));
+                    //foreach (var folder in folders)
+                    //{
+                    //    var file = Directory.GetFiles(folder).FirstOrDefault();
+                    //    var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(folder, "data"));
+                    //    ZipFile.ExtractToDirectory(file, extractedDirectoryPath.FullName);
+
+                    //    var jsonData = GetJsonFilePath(extractedDirectoryPath.FullName);
+                    //    var userId = new DirectoryInfo(folder).Name;
+                    //    await userLocationsService.CreateUserLocationsAsync(userId, jsonData);
+
+                    //    Directory.Delete(folder, true);
+                    //}
 
                 }
                 catch (Exception ex)
                 {
                     logger.LogError(ex, nameof(FileParseBackgroundService));
                 }
-                
+
                 await Task.Delay(10000);
             }
         }

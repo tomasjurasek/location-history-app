@@ -50,13 +50,14 @@ namespace API.Controllers
 
             try
             {
-                tempDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", $"{userId}");
-                Directory.CreateDirectory(tempDirectoryPath);
-
-                var uploadedFilePath = Path.Combine(tempDirectoryPath, file.FileName);
-                await using (Stream stream = new FileStream(uploadedFilePath, FileMode.Create))
+                //tempDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", $"{userId}");
+                //Directory.CreateDirectory(tempDirectoryPath);
+                //file.Str
+                //var uploadedFilePath = Path.Combine(tempDirectoryPath, file.FileName);
+                using (Stream stream = new MemoryStream())
                 {
-                    //await file.CopyToAsync(stream);
+                    await file.CopyToAsync(stream);
+                    stream.Position = 0;
                     await azureBlobService.UploadFile(userId, stream);
                 }
 
