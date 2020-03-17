@@ -15,9 +15,9 @@ namespace API.Services
             this.amazonService = amazonService;
         }
 
-        public async Task<IEnumerable<Locations>> CreateUserLocationsAsync(string userId, string jsonData)
+        public async Task<IEnumerable<Locations>> CreateUserLocationsAsync(string userId, string jsonFilePath)
         {
-            var locations = googleLocationParser.Parse(jsonData).ToList();
+            var locations = googleLocationParser.Parse(jsonFilePath).ToList();
             await amazonService.UploadCsvData(userId, locations);
            
             return locations;

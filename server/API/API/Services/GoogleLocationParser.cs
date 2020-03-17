@@ -1,19 +1,23 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static API.Controllers.UsersController;
+using Newtonsoft.Json;
 
 namespace API.Services
 {
     public class GoogleLocationParser
     {
-        public IEnumerable<Locations> Parse(string json)
+        public IEnumerable<Locations> Parse(string jsonFilePath)
         {
             var response = new List<Locations>();
-            var jsonData = JsonConvert.DeserializeObject<GoogleRootObject>(json);
+            GoogleRootObject jsonData;
+
+            using (StreamReader file = File.OpenText(jsonFilePath))
+            {
+                var serializer = new JsonSerializer();
+                jsonData = (GoogleRootObject)serializer.Deserialize(file, typeof(GoogleRootObject));
+            }
 
             foreach (var item in jsonData.Locations)
             {
@@ -35,8 +39,7 @@ namespace API.Services
 
     public class GoogleRootObject
     {
-        [JsonProperty("locations")]
-        public List<GoogleLocation> Locations { get; set; }
+        [JsonProperty("locations")] public List<GoogleLocation> Locations { get; set; }
     }
 
     public class GoogleLocation
