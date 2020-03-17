@@ -45,11 +45,6 @@ namespace API.Controllers
                 return BadRequest("No file has been uploaded.");
             }
 
-            if (!IsFileContentTypeValid(file))
-            {
-                return BadRequest("File must be a zip.");
-            }
-
             if (!IsFileLengthValid(file))
             {
                 return BadRequest("File size exceeded configured limit.");
