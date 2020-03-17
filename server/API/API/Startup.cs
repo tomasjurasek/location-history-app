@@ -1,3 +1,4 @@
+using API.ServiceBus;
 using API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -38,6 +39,7 @@ namespace API
             services.AddTransient<UserLocationsService>();
             services.AddSingleton<AmazonService>();
             services.AddHostedService<FileParseBackgroundService>();
+            services.AddSingleton<LocationCreatedSender>();
             services.AddSingleton<LocationCreatedReceiver>();
             services.AddSingleton<AzureBlobService>();
             services.Configure<AmazonOptions>(Configuration.GetSection("Amazon"));
