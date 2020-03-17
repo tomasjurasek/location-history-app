@@ -31,6 +31,7 @@ namespace API.Controllers
 
         [HttpPost("{userId}/file")]
         [RequestSizeLimit(104857600)]
+        [RequestFormLimits(MultipartBodyLengthLimit = 104857600)]
         public async Task<ActionResult<UserLocationViewModel>> UploadFileAsync(string userId, [FromForm] IFormFile file)
         {
             var response = new UserLocationViewModel
