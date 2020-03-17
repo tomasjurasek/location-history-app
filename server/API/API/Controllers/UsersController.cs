@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using API.Models;
@@ -32,6 +33,13 @@ namespace API.Controllers
             this.config = config;
             this.azureBlobService = azureBlobService;
             this.locationCreatedSender = locationCreatedSender;
+        }
+
+        [HttpGet("{userId}/locations")]
+        public async Task<ActionResult<IList<LocationViewModel>>> Get(string userId)
+        {
+            var response = new List<LocationViewModel>();
+            return response;
         }
 
         [HttpPost("file")]
