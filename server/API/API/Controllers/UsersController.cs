@@ -20,13 +20,15 @@ namespace API.Controllers
         private readonly ILogger<UsersController> logger;
         private readonly IWebHostEnvironment env;
         private readonly IConfiguration config;
+        private readonly AzureBlobService azureBlobService;
 
-        public UsersController(UserLocationsService locationService, ILogger<UsersController> logger, IWebHostEnvironment env, IConfiguration config)
+        public UsersController(UserLocationsService locationService, ILogger<UsersController> logger, IWebHostEnvironment env, IConfiguration config, AzureBlobService azureBlobService)
         {
             this.locationService = locationService;
             this.logger = logger;
             this.env = env;
             this.config = config;
+            this.azureBlobService = azureBlobService;
         }
 
         [HttpPost("{userId}/file")]
@@ -54,7 +56,8 @@ namespace API.Controllers
                 var uploadedFilePath = Path.Combine(tempDirectoryPath, file.FileName);
                 await using (Stream stream = new FileStream(uploadedFilePath, FileMode.Create))
                 {
-                    await file.CopyToAsync(stream);
+                    //await file.CopyToAsync(stream);
+                    await azureBlobService.UploadFile(userId, stream);
                 }
 
             }

@@ -38,6 +38,7 @@ namespace API
             services.AddTransient<UserLocationsService>();
             services.AddSingleton<AmazonService>();
             services.AddHostedService<FileParseBackgroundService>();
+            services.AddSingleton<AzureBlobService>();
             services.Configure<AmazonOptions>(Configuration.GetSection("Amazon"));
             services.AddSwaggerGen(c =>
             {
