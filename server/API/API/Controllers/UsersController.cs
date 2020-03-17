@@ -45,10 +45,10 @@ namespace API.Controllers
                 return BadRequest("No file has been uploaded.");
             }
 
-            //if(!IsFileContentTypeValid(file))
-            //{
-            //    return BadRequest("File must be a zip.");
-            //}
+            if (!IsFileContentTypeValid(file))
+            {
+                return BadRequest("File must be a zip.");
+            }
 
             if (!IsFileLengthValid(file))
             {
@@ -57,8 +57,7 @@ namespace API.Controllers
 
             try
             {
-                //var userFolderPath = $"{Directory.GetCurrentDirectory()}/wwwroot/{userId}";
-                tempDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", $"{userId}");
+                tempDirectoryPath = Path.Combine(env.WebRootPath, $"{userId}");
                 Directory.CreateDirectory(tempDirectoryPath);
 
                 var uploadedFilePath = Path.Combine(tempDirectoryPath, file.FileName);
@@ -82,8 +81,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                //throw new Exception("Processing of uploaded file failed.", ex);
-                logger.LogError(ex, "Processing of uploaded file failed.");
+                throw new Exception("Processing of uploaded file failed.", ex);
             }
             finally
             {
@@ -96,8 +94,7 @@ namespace API.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // throw new Exception($"Deleting of temporary folder '{tempDirectoryPath}' failed.", ex);
-                    logger.LogError(ex, $"Deleting of temporary folder '{tempDirectoryPath}' failed.");
+                    logger.LogError(ex, "Deleting of temporary folder '{TempDirectoryPath}' failed. Exception: {Exception}.", tempDirectoryPath, ex.ToString());
                 }
             }
 
