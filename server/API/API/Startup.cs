@@ -1,6 +1,7 @@
 using API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -39,6 +40,12 @@ namespace API
             services.AddSingleton<AmazonService>();
             services.AddHostedService<FileParseService>();
             services.Configure<AmazonOptions>(Configuration.GetSection("Amazon"));
+            //services.Configure<FormOptions>(options =>
+            //{
+            //    options.BufferBodyLengthLimit = long.MaxValue;
+            //    options.MultipartBodyLengthLimit = long.MaxValue;
+            //    options.MultipartBoundaryLengthLimit = int.MaxValue;
+            //});
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Location History API", Version = "v1"});
