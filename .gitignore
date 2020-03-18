@@ -34,3 +34,4 @@ msbuild.wrn
 #IntelliJ Idea
 .idea
 /server/API/API/Properties/PublishProfiles
+/server/API/GoogleFileParser/local.settings.json
