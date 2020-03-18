@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace API.Services
+namespace Services
 {
     public class GoogleLocationParser
     {

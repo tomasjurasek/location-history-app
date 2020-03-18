@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.Services
+namespace Services
 {
     public class UserLocationsService
     {

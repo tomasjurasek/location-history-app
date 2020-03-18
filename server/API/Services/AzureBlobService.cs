@@ -1,20 +1,22 @@
 ﻿using Azure.Storage.Blobs;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Services.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.Services
+namespace Services
 {
     public class AzureBlobService
     {
         private BlobContainerClient containerClient;
 
-        public AzureBlobService(IConfiguration config)
+        public AzureBlobService(IOptions<AzureBlobServiceOptions> options)
         {
-            var storageConnectionString = config.GetValue<string>("AzureStorageAccount");
+            var storageConnectionString = options.Value.StorageAccount;
             BlobServiceClient blobServiceClient = new BlobServiceClient(storageConnectionString);
             containerClient = blobServiceClient.GetBlobContainerClient("locationfile");
         }
