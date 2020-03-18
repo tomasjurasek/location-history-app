@@ -23,31 +23,25 @@ namespace API.Controllers
     [Route("api/users")]
     public partial class UsersController : Controller
     {
-        private readonly UserLocationsService locationService;
         private readonly ILogger<UsersController> logger;
         private readonly IConfiguration config;
         private readonly AzureBlobService azureBlobService;
         private readonly LocationCreatedSender locationCreatedSender;
-        private readonly IHttpClientFactory httpClientFactory;
         private readonly LocationDbContext locationDbContext;
         private readonly AmazonService amazonService;
 
-        public UsersController(UserLocationsService locationService,
-            ILogger<UsersController> logger,
+        public UsersController(ILogger<UsersController> logger,
             IConfiguration config,
             AzureBlobService azureBlobService,
             LocationCreatedSender locationCreatedSender,
-            IHttpClientFactory httpClientFactory,
             LocationDbContext locationDbContext,
             AmazonService amazonService
             )
         {
-            this.locationService = locationService;
             this.logger = logger;
             this.config = config;
             this.azureBlobService = azureBlobService;
             this.locationCreatedSender = locationCreatedSender;
-            this.httpClientFactory = httpClientFactory;
             this.locationDbContext = locationDbContext;
             this.amazonService = amazonService;
         }
@@ -152,7 +146,7 @@ namespace API.Controllers
             return response;
         }
 
-        public static string RandomString(int length)
+        private static string RandomString(int length)
         {
             Random random = new Random();
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

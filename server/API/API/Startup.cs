@@ -55,13 +55,6 @@ namespace API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Location History API", Version = "v1" });
             });
-            services.AddHttpClient("Keboola", s =>
-            {
-                var apiToken = Configuration.GetValue<string>("KeboolaToken");
-                s.BaseAddress = new Uri("https://connection.eu-central-1.keboola.com/");
-                s.DefaultRequestHeaders.Add("X-StorageApi-Token", apiToken);
-
-            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

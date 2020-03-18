@@ -22,20 +22,11 @@ namespace FileParserWebjob
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-
                     services.AddHostedService<Worker>();
                     services.AddServices();
                     services.Configure<AmazonOptions>(hostContext.Configuration.GetSection("Amazon"));
                     services.Configure<AzureBlobServiceOptions>(hostContext.Configuration.GetSection("Azure"));
                     services.Configure<AzureServiceBusOptions>(hostContext.Configuration.GetSection("Azure"));
-                    services.AddHttpClient("Keboola", s =>
-                    {
-                        var token = hostContext.Configuration.GetValue<string>("KeboolaToken");
-                        var apiToken = token;
-                        s.BaseAddress = new Uri("https://connection.eu-central-1.keboola.com/");
-                        s.DefaultRequestHeaders.Add("X-StorageApi-Token", apiToken);
-                    });
-
                 });
     }
 }
