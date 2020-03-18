@@ -69,7 +69,12 @@ namespace API.Controllers
                     Longitude = s.Longitude
                 }));
 
-                return locations;
+                if(locations.Any())
+                {
+                    return locations;
+                }
+
+                return NoContent();
             }
 
             return NotFound();

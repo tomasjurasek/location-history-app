@@ -1,4 +1,5 @@
 ﻿using Database;
+using Database.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -32,6 +33,8 @@ namespace API.Services.ServiceBus
         public override async Task ProcessEventAsync(LocationsCreatedMessage message, CancellationToken cancellationToken)
         {
             var userId = message.UserId;
+            string folderPath = string.Empty;
+            User user = null;
             try
             {
                 using (var stream = await azureBlobService.DownloadFile(userId))
@@ -39,7 +42,7 @@ namespace API.Services.ServiceBus
                     if (stream != null)
                     {
                         stream.Position = 0;
-                        var folderPath = Path.Combine(Directory.GetCurrentDirectory(), userId);
+                        folderPath = Path.Combine(Directory.GetCurrentDirectory(), userId);
                         Directory.CreateDirectory(Path.Combine(folderPath));
 
                         logger.LogInformation($"File created - {folderPath}");
@@ -50,21 +53,18 @@ namespace API.Services.ServiceBus
                         {
                             await stream.CopyToAsync(fileStream);
                         }
-                     
+
                         var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(folderPath, "data"));
                         ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
 
                         var jsonData = GetJsonFilePath(extractedDirectoryPath.FullName);
                         await userLocationsService.CreateUserLocationsAsync(userId, jsonData);
 
-                        Directory.Delete(folderPath, true);
-                        await azureBlobService.DeleteFile(userId);
 
-                        var user = locationDbContext.Users.FirstOrDefault(s => s.UserIdentifier == userId);
-                        if(user != null)
+                        user = locationDbContext.Users.FirstOrDefault(s => s.UserIdentifier == userId);
+                        if (user != null)
                         {
-                            user.Status = Database.Entities.Status.Done;
-                            await locationDbContext.SaveChangesAsync();
+                            user.Status = Status.Done;
                         }
                     }
                 }
@@ -72,8 +72,30 @@ namespace API.Services.ServiceBus
             catch (Exception ex)
             {
                 logger.LogError(ex, $"Processing failed for user - {userId}");
+                if (user != null)
+                {
+                    user.Status = Status.Failed;
+                }
             }
-            
+            finally
+            {
+                if (!string.IsNullOrEmpty(folderPath))
+                {
+                    try
+                    {
+                        Directory.Delete(folderPath, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, $"Delete file failed for user - {userId}");
+                    }
+                    
+                }
+
+                await azureBlobService.DeleteFile(userId);
+                await locationDbContext.SaveChangesAsync();
+            }
+
         }
 
         private string GetJsonFilePath(string directoryPath)

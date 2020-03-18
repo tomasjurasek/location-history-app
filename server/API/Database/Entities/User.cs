@@ -16,6 +16,7 @@ namespace Database.Entities
     {
         Undefined = 0,
         InProgress = 1,
-        Done = 0
+        Done = 2,
+        Failed = 3 
     }
 }
