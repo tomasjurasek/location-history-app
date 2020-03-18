@@ -69,12 +69,12 @@ namespace API.Controllers
                     Longitude = s.Longitude
                 }));
 
-                if(locations.Any())
+                if (locations.Any())
                 {
                     return locations;
                 }
 
-                if(user.Status == Database.Entities.Status.InProgress)
+                if (user.Status == Database.Entities.Status.InProgress)
                 {
                     return NoContent();
                 }
@@ -84,15 +84,20 @@ namespace API.Controllers
         }
 
         [HttpDelete("{userId}")]
-        public async Task<ActionResult> Delete(string userId)
+        public async Task<ActionResult> Delete(string userId, [FromQuery]string token)
         {
-            var result = await amazonService.Delete(userId);
-            if (result)
+            var user = await locationDbContext.Users.FirstOrDefaultAsync(s => s.UserIdentifier == userId && s.Token == token);
+            if (user != null)
             {
-                return Ok();
+                var result = await amazonService.Delete(userId);
+                if (result)
+                {
+                    return Ok();
+                }
+                return BadRequest();
             }
 
-            return BadRequest();
+            return NotFound();
         }
 
         public class KebolaDataRoot
