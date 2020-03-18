@@ -38,12 +38,16 @@ namespace API.Services.ServiceBus
                         stream.Position = 0;
                         var folderPath = Path.Combine(Directory.GetCurrentDirectory(), userId);
                         Directory.CreateDirectory(Path.Combine(folderPath));
+
+                        logger.LogInformation($"File created - {folderPath}");
+
                         var uploadedFilePath = Path.Combine(folderPath, $"{userId}.zip");
-                        using (Stream fileStream = new FileStream(uploadedFilePath, FileMode.Create))
+
+                        using (var fileStream = File.Create(uploadedFilePath))
                         {
                             await stream.CopyToAsync(fileStream);
                         }
-
+                     
                         var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(folderPath, "data"));
                         ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
 
