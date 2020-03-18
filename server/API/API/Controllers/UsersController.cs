@@ -52,6 +52,10 @@ namespace API.Controllers
         [HttpGet("{userId}/locations")]
         public async Task<ActionResult<IList<LocationViewModel>>> Get(string userId, [FromQuery]string token)
         {
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is missing.");
+            }
 
             var user = await locationDbContext.Users.FirstOrDefaultAsync(s => s.UserIdentifier == userId && s.Token == token);
             var locations = new List<LocationViewModel>();
