@@ -61,6 +61,7 @@ namespace Services
                 using (var client = new AmazonS3Client(amazonOptions.Value.Key, amazonOptions.Value.Secret, RegionEndpoint.EUCentral1))
                 {
                     var folder = Path.Combine(Directory.GetCurrentDirectory(), $"amazon-{userId}");
+                    Directory.CreateDirectory(folder);
                     var file = Path.Combine(folder, $"{userId}.csv");
                     var uploadRequest = new TransferUtilityDownloadRequest
                     {
@@ -84,6 +85,43 @@ namespace Services
             }
 
             return response;
+        }
+
+        public async Task<bool> Delete(string userId)
+        {
+            try
+            {
+                using (var client = new AmazonS3Client(amazonOptions.Value.Key, amazonOptions.Value.Secret, RegionEndpoint.EUCentral1))
+                {
+                    var folder = Path.Combine(Directory.GetCurrentDirectory(), $"amazon-delete-{userId}");
+                    Directory.CreateDirectory(folder);
+                    var file = Path.Combine(folder, $"{userId}.csv");
+
+                    var headerFile = "id,date,longitude,latitude,accuracy";
+
+                    using (var fileStream = File.Create(file))
+                    {
+                        using (var stream = GenerateStream(headerFile))
+                        {
+                            stream.CopyTo(fileStream);
+                        }
+                    }
+
+                    var fileTransferUtility = new TransferUtility(client);
+                    await fileTransferUtility.UploadAsync(file, amazonOptions.Value.Bucket);
+
+                    Directory.Delete(folder, true);
+
+                    return true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, nameof(UploadCsvData));
+            }
+
+            return false;
         }
 
         public static List<Locations> ConvertFromCsv(string[] fileData)

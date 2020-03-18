@@ -55,9 +55,10 @@ namespace API.Controllers
             }
 
             var user = await locationDbContext.Users.FirstOrDefaultAsync(s => s.UserIdentifier == userId && s.Token == token);
-            var locations = new List<LocationViewModel>();
+
             if (user != null)
             {
+                var locations = new List<LocationViewModel>();
                 var data = await amazonService.GetLocations(userId);
 
                 locations.AddRange(data.Select(s => new LocationViewModel
@@ -67,9 +68,23 @@ namespace API.Controllers
                     Latitude = s.Latitude,
                     Longitude = s.Longitude
                 }));
+
+                return locations;
             }
 
-            return locations;
+            return NotFound();
+        }
+
+        [HttpDelete("{userId}")]
+        public async Task<ActionResult> Delete(string userId)
+        {
+            var result = await amazonService.Delete(userId);
+            if (result)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
         }
 
         public class KebolaDataRoot
