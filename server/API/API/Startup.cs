@@ -41,7 +41,7 @@ namespace API
 
             services.AddServices();
 
-            services.AddHostedService<FileParseBackgroundService>();
+            // services.AddHostedService<FileParseBackgroundService>();
             services.Configure<AmazonOptions>(Configuration.GetSection("Amazon"));
             services.Configure<AzureBlobServiceOptions>(Configuration.GetSection("Azure"));
             services.Configure<AzureServiceBusOptions>(Configuration.GetSection("Azure"));
