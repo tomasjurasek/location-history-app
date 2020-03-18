@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "FileParserWebjob": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

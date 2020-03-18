@@ -6,6 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Services;
+using Services.Extensions;
+using Services.Options;
 using System;
 
 namespace API
@@ -35,19 +38,17 @@ namespace API
                         .AllowAnyMethod()
                         .AllowAnyHeader());
             });
-            services.AddTransient<GoogleLocationParser>();
-            services.AddTransient<UserLocationsService>();
-            services.AddSingleton<AmazonService>();
+
+            services.AddServices();
+
             services.AddHostedService<FileParseBackgroundService>();
-            services.AddSingleton<LocationCreatedSender>();
-            services.AddSingleton<LocationCreatedReceiver>();
-            services.AddSingleton<AzureBlobService>();
             services.Configure<AmazonOptions>(Configuration.GetSection("Amazon"));
+            services.Configure<AzureBlobServiceOptions>(Configuration.GetSection("Azure"));
+            services.Configure<AzureServiceBusOptions>(Configuration.GetSection("Azure"));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Location History API", Version = "v1" });
             });
-
             services.AddHttpClient("Keboola", s =>
             {
                 var apiToken = Configuration.GetValue<string>("KeboolaToken");
