@@ -74,12 +74,10 @@ namespace API.Controllers
                     return locations;
                 }
 
-                if(user.Status == Database.Entities.Status.Done)
+                if(user.Status == Database.Entities.Status.InProgress)
                 {
-                    return NotFound();
+                    return NoContent();
                 }
-
-                return NoContent();
             }
 
             return NotFound();
