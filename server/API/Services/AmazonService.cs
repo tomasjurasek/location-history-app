@@ -28,6 +28,7 @@ namespace Services
         {
             try
             {
+                logger.LogInformation($"Start: Upload csv for ${userId}");
                 using (var client = new AmazonS3Client(amazonOptions.Value.Key, amazonOptions.Value.Secret, RegionEndpoint.EUCentral1))
                 {
                     var csvData = ConvertToCsv(userId, locations);
@@ -42,6 +43,8 @@ namespace Services
                     var fileTransferUtility = new TransferUtility(client);
                     await fileTransferUtility.UploadAsync(uploadRequest);
                 }
+
+                logger.LogInformation($"Finish: Upload csv for ${userId}");
             }
             catch (Exception ex)
             {
