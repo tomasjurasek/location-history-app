@@ -30,8 +30,10 @@ namespace Services
                 });
             }
 
+            var threeWeeksAgo = DateTime.UtcNow.AddDays(-21);
+
             return response
-                .Where(s => s.DateTimeUtc >= new DateTime(2020, 3, 1))
+                .Where(s => s.DateTimeUtc >= threeWeeksAgo)
                 .OrderBy(s => s.DateTimeUtc);
         }
     }
