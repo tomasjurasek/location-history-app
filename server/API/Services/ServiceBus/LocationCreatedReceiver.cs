@@ -1,6 +1,7 @@
 ﻿using Database;
 using Database.Entities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Services;
@@ -19,81 +20,86 @@ namespace API.Services.ServiceBus
         private readonly ILogger<ServiceBusReceiver> logger;
         private readonly UserLocationsService userLocationsService;
         private readonly AzureBlobService azureBlobService;
-        private readonly LocationDbContext locationDbContext;
+        private readonly IServiceScopeFactory serviceScopeFactory;
 
         public LocationCreatedReceiver(IOptions<AzureServiceBusOptions> options, ILogger<ServiceBusReceiver> logger,
-            UserLocationsService userLocationsService, AzureBlobService azureBlobService, LocationDbContext locationDbContext) : base(options, logger)
+            UserLocationsService userLocationsService, AzureBlobService azureBlobService, IServiceScopeFactory serviceScopeFactory) : base(options, logger)
         {
             this.logger = logger;
             this.userLocationsService = userLocationsService;
             this.azureBlobService = azureBlobService;
-            this.locationDbContext = locationDbContext;
+            this.serviceScopeFactory = serviceScopeFactory;
         }
 
         public override async Task ProcessEventAsync(LocationsCreatedMessage message, CancellationToken cancellationToken)
         {
-            var userId = message.UserId;
-            string folderPath = string.Empty;
-            User user = null;
-            try
+            using (var scope = serviceScopeFactory.CreateScope())
             {
-                using (var stream = await azureBlobService.DownloadFile(userId))
+                var locationDbContext = scope.ServiceProvider.GetRequiredService<LocationDbContext>();
+
+                var userId = message.UserId;
+                string folderPath = string.Empty;
+                User user = null;
+                try
                 {
-                    if (stream != null)
+                    using (var stream = await azureBlobService.DownloadFile(userId))
                     {
-                        stream.Position = 0;
-                        folderPath = Path.Combine(Directory.GetCurrentDirectory(), userId);
-                        Directory.CreateDirectory(Path.Combine(folderPath));
-
-                        logger.LogInformation($"File created - {folderPath}");
-
-                        var uploadedFilePath = Path.Combine(folderPath, $"{userId}.zip");
-
-                        using (var fileStream = File.Create(uploadedFilePath))
+                        if (stream != null)
                         {
-                            await stream.CopyToAsync(fileStream);
+                            stream.Position = 0;
+                            folderPath = Path.Combine(Directory.GetCurrentDirectory(), userId);
+                            Directory.CreateDirectory(Path.Combine(folderPath));
+
+                            logger.LogInformation($"File created - {folderPath}");
+
+                            var uploadedFilePath = Path.Combine(folderPath, $"{userId}.zip");
+
+                            using (var fileStream = File.Create(uploadedFilePath))
+                            {
+                                await stream.CopyToAsync(fileStream);
+                            }
+
+                            var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(folderPath, "data"));
+                            ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
+
+                            var jsonData = GetJsonFilePath(extractedDirectoryPath.FullName);
+                            await userLocationsService.CreateUserLocationsAsync(userId, jsonData);
+
+
+                            user = locationDbContext.Users.FirstOrDefault(s => s.UserIdentifier == userId);
+                            if (user != null)
+                            {
+                                user.Status = Status.Done;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, $"Processing failed for user - {userId}");
+                    if (user != null)
+                    {
+                        user.Status = Status.Failed;
+                    }
+                }
+                finally
+                {
+                    if (!string.IsNullOrEmpty(folderPath))
+                    {
+                        try
+                        {
+                            Directory.Delete(folderPath, true);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, $"Delete file failed for user - {userId}");
                         }
 
-                        var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(folderPath, "data"));
-                        ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
-
-                        var jsonData = GetJsonFilePath(extractedDirectoryPath.FullName);
-                        await userLocationsService.CreateUserLocationsAsync(userId, jsonData);
-
-
-                        user = locationDbContext.Users.FirstOrDefault(s => s.UserIdentifier == userId);
-                        if (user != null)
-                        {
-                            user.Status = Status.Done;
-                        }
                     }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, $"Processing failed for user - {userId}");
-                if (user != null)
-                {
-                    user.Status = Status.Failed;
-                }
-            }
-            finally
-            {
-                if (!string.IsNullOrEmpty(folderPath))
-                {
-                    try
-                    {
-                        Directory.Delete(folderPath, true);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, $"Delete file failed for user - {userId}");
-                    }
-                    
-                }
 
-                await azureBlobService.DeleteFile(userId);
-                await locationDbContext.SaveChangesAsync();
+                    await azureBlobService.DeleteFile(userId);
+                    await locationDbContext.SaveChangesAsync();
+                }
             }
 
         }
