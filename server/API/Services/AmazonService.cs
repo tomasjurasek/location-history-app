@@ -7,6 +7,7 @@ using Services.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -51,6 +52,63 @@ namespace Services
                 logger.LogError(ex, nameof(UploadCsvData));
             }
         }
+
+        public async Task<List<Locations>> GetLocations(string userId)
+        {
+            var response = new List<Locations>();
+            try
+            {
+                using (var client = new AmazonS3Client(amazonOptions.Value.Key, amazonOptions.Value.Secret, RegionEndpoint.EUCentral1))
+                {
+                    var folder = Path.Combine(Directory.GetCurrentDirectory(), $"amazon-{userId}");
+                    var file = Path.Combine(folder, $"{userId}.csv");
+                    var uploadRequest = new TransferUtilityDownloadRequest
+                    {
+                        Key = $"{userId}.csv",
+                        BucketName = amazonOptions.Value.Bucket,
+                        FilePath = file
+                    };
+
+                    var fileTransferUtility = new TransferUtility(client);
+                    await fileTransferUtility.DownloadAsync(uploadRequest);
+
+                    var fileData = File.ReadAllLines(file);
+                    response = ConvertFromCsv(fileData);
+                    Directory.Delete(folder, true);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, nameof(UploadCsvData));
+            }
+
+            return response;
+        }
+
+        public static List<Locations> ConvertFromCsv(string[] fileData)
+        {
+            var locations = new List<Locations>();
+            foreach (var csvLine in fileData)
+            {
+                string[] values = csvLine.Split(',');
+                if (values[0] != "id")
+                {
+                    locations.Add(new Locations
+                    {
+                        DateTimeUtc = Convert.ToDateTime(values[1]),
+                        Longitude = int.Parse(values[2]),
+                        Latitude = int.Parse(values[3]),
+                        Accuracy = int.Parse(values[4])
+                    });
+
+                }
+            }
+
+            return locations;
+        }
+
+
 
         private static string ConvertToCsv(string userId, IEnumerable<Locations> locations)
         {

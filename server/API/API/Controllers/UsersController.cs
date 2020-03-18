@@ -30,6 +30,7 @@ namespace API.Controllers
         private readonly LocationCreatedSender locationCreatedSender;
         private readonly IHttpClientFactory httpClientFactory;
         private readonly LocationDbContext locationDbContext;
+        private readonly AmazonService amazonService;
 
         public UsersController(UserLocationsService locationService,
             ILogger<UsersController> logger,
@@ -37,7 +38,8 @@ namespace API.Controllers
             AzureBlobService azureBlobService,
             LocationCreatedSender locationCreatedSender,
             IHttpClientFactory httpClientFactory,
-            LocationDbContext locationDbContext
+            LocationDbContext locationDbContext,
+            AmazonService amazonService
             )
         {
             this.locationService = locationService;
@@ -47,6 +49,7 @@ namespace API.Controllers
             this.locationCreatedSender = locationCreatedSender;
             this.httpClientFactory = httpClientFactory;
             this.locationDbContext = locationDbContext;
+            this.amazonService = amazonService;
         }
 
         [HttpGet("{userId}/locations")]
@@ -61,38 +64,15 @@ namespace API.Controllers
             var locations = new List<LocationViewModel>();
             if (user != null)
             {
-                var keboolaClient = httpClientFactory.CreateClient("Keboola");
-                var requesResponse = await keboolaClient.GetAsync($"v2/storage/tables/in.c-keboola-ex-aws-s3-117966293.data/data-preview?format=json&whereFilters[0][column]=id&whereFilters[0][operator]=eq&whereFilters[0][values][0]={userId}");
-                var json = await requesResponse.Content.ReadAsStringAsync();
+                var data = await amazonService.GetLocations(userId);
 
-                var data = JsonConvert.DeserializeObject<KebolaDataRoot>(json);
-
-                for (int i = 0; i <= data.Rows.Length - 1; i++)
+                locations.AddRange(data.Select(s => new LocationViewModel
                 {
-                    var location = new LocationViewModel();
-                    for (int y = 0; y <= data.Rows[i].Length - 1; y++)
-                    {
-                        var row = data.Rows[i][y];
-                        if (row.ColumnName == "date")
-                        {
-                            location.DateTimeUtc = Convert.ToDateTime(row.Value);
-                        }
-                        else if (row.ColumnName == "accuracy")
-                        {
-                            location.Accuracy = int.Parse(row.Value);
-                        }
-                        else if (row.ColumnName == "longitude")
-                        {
-                            location.Longitude = int.Parse(row.Value);
-                        }
-                        else if (row.ColumnName == "latitude")
-                        {
-                            location.Latitude = int.Parse(row.Value);
-                        }
-                    }
-
-                    locations.Add(location);
-                }
+                    DateTimeUtc = s.DateTimeUtc,
+                    Accuracy = s.Accuracy,
+                    Latitude = s.Latitude,
+                    Longitude = s.Longitude
+                }));
             }
 
             return locations;

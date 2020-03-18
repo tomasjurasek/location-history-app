@@ -13,10 +13,10 @@ namespace Services.Extensions
         {
 
             services.AddSingleton<GoogleLocationParser>();
-            services.AddSingleton<UserLocationsService>();
+            services.AddTransient<UserLocationsService>();
             services.AddSingleton<AmazonService>();
-            services.AddSingleton<LocationCreatedSender>();
-            services.AddSingleton<LocationCreatedReceiver>();
+            services.AddTransient<LocationCreatedSender>();
+            services.AddTransient<LocationCreatedReceiver>();
             services.AddSingleton<AzureBlobService>();
 
             return services;
