@@ -1,7 +1,9 @@
 using API.Services;
 using API.Services.ServiceBus;
+using Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -40,6 +42,10 @@ namespace API
             });
 
             services.AddServices();
+            services.AddDbContext<LocationDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("Database"));
+            });
 
             services.AddHostedService<FileParseBackgroundService>();
             services.Configure<AmazonOptions>(Configuration.GetSection("Amazon"));

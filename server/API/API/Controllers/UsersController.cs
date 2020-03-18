@@ -9,8 +9,10 @@ using Amazon.Runtime;
 using API.Models;
 using API.Services;
 using API.Services.ServiceBus;
+using Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -27,13 +29,15 @@ namespace API.Controllers
         private readonly AzureBlobService azureBlobService;
         private readonly LocationCreatedSender locationCreatedSender;
         private readonly IHttpClientFactory httpClientFactory;
+        private readonly LocationDbContext locationDbContext;
 
         public UsersController(UserLocationsService locationService,
             ILogger<UsersController> logger,
             IConfiguration config,
             AzureBlobService azureBlobService,
             LocationCreatedSender locationCreatedSender,
-            IHttpClientFactory httpClientFactory
+            IHttpClientFactory httpClientFactory,
+            LocationDbContext locationDbContext
             )
         {
             this.locationService = locationService;
@@ -42,45 +46,51 @@ namespace API.Controllers
             this.azureBlobService = azureBlobService;
             this.locationCreatedSender = locationCreatedSender;
             this.httpClientFactory = httpClientFactory;
+            this.locationDbContext = locationDbContext;
         }
 
         [HttpGet("{userId}/locations")]
-        public async Task<ActionResult<IList<LocationViewModel>>> Get(string userId)
+        public async Task<ActionResult<IList<LocationViewModel>>> Get(string userId, [FromQuery]string token)
         {
-            var keboolaClient = httpClientFactory.CreateClient("Keboola");
-            var requesResponse = await keboolaClient.GetAsync($"v2/storage/tables/in.c-keboola-ex-aws-s3-117966293.data/data-preview?format=json&whereFilters[0][column]=id&whereFilters[0][operator]=eq&whereFilters[0][values][0]={userId}");
-            var json = await requesResponse.Content.ReadAsStringAsync();
 
-            var data = JsonConvert.DeserializeObject<KebolaDataRoot>(json);
-
+            var user = await locationDbContext.Users.FirstOrDefaultAsync(s => s.UserIdentifier == userId && s.Token == token);
             var locations = new List<LocationViewModel>();
-            for (int i = 0; i <= data.Rows.Length - 1; i++)
+            if (user != null)
             {
-                var location = new LocationViewModel();
-                for (int y = 0; y <= data.Rows[i].Length - 1; y++)
-                {
-                    var row = data.Rows[i][y];
-                    if (row.ColumnName == "date")
-                    {
-                        location.DateTimeUtc = Convert.ToDateTime(row.Value);
-                    }
-                    else if (row.ColumnName == "accuracy")
-                    {
-                        location.Accuracy = int.Parse(row.Value);
-                    }
-                    else if (row.ColumnName == "longitude")
-                    {
-                        location.Longitude = int.Parse(row.Value);
-                    }
-                    else if (row.ColumnName == "latitude")
-                    {
-                        location.Latitude = int.Parse(row.Value);
-                    }
-                }
+                var keboolaClient = httpClientFactory.CreateClient("Keboola");
+                var requesResponse = await keboolaClient.GetAsync($"v2/storage/tables/in.c-keboola-ex-aws-s3-117966293.data/data-preview?format=json&whereFilters[0][column]=id&whereFilters[0][operator]=eq&whereFilters[0][values][0]={userId}");
+                var json = await requesResponse.Content.ReadAsStringAsync();
 
-                locations.Add(location);
+                var data = JsonConvert.DeserializeObject<KebolaDataRoot>(json);
+
+                for (int i = 0; i <= data.Rows.Length - 1; i++)
+                {
+                    var location = new LocationViewModel();
+                    for (int y = 0; y <= data.Rows[i].Length - 1; y++)
+                    {
+                        var row = data.Rows[i][y];
+                        if (row.ColumnName == "date")
+                        {
+                            location.DateTimeUtc = Convert.ToDateTime(row.Value);
+                        }
+                        else if (row.ColumnName == "accuracy")
+                        {
+                            location.Accuracy = int.Parse(row.Value);
+                        }
+                        else if (row.ColumnName == "longitude")
+                        {
+                            location.Longitude = int.Parse(row.Value);
+                        }
+                        else if (row.ColumnName == "latitude")
+                        {
+                            location.Latitude = int.Parse(row.Value);
+                        }
+                    }
+
+                    locations.Add(location);
+                }
             }
-           
+
             return locations;
         }
 
@@ -109,10 +119,12 @@ namespace API.Controllers
         [RequestFormLimits(MultipartBodyLengthLimit = 104857600)]
         public async Task<ActionResult<UserLocationViewModel>> UploadFileAsync([FromForm] IFormFile file)
         {
-            var userId = Guid.NewGuid().ToString();
+            var userId = $"{RandomString(3)}-{RandomString(3)}-{RandomString(3)}";
+            var token = Guid.NewGuid();
             var response = new UserLocationViewModel
             {
-                Id = userId
+                Id = userId,
+                Token = token.ToString()
             };
 
             if (file == null)
@@ -136,6 +148,14 @@ namespace API.Controllers
                     {
                         UserId = userId
                     });
+
+                    locationDbContext.Users.Add(new Database.Entities.User
+                    {
+                        Status = Database.Entities.Status.Undefined,
+                        Token = token.ToString(),
+                        UserIdentifier = userId
+                    });
+                    await locationDbContext.SaveChangesAsync();
                 }
 
             }
@@ -146,6 +166,14 @@ namespace API.Controllers
 
 
             return response;
+        }
+
+        public static string RandomString(int length)
+        {
+            Random random = new Random();
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
         private bool IsFileLengthValid(IFormFile file)

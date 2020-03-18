@@ -8,6 +8,6 @@ namespace API.Models
     public class UserLocationViewModel
     {
         public string Id { get; set; }
-        public IList<LocationViewModel> Locations { get; set; }
+        public string Token { get; set; }
     }
 }
