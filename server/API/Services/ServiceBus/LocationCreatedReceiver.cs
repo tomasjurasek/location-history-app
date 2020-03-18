@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Database;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Services;
@@ -17,13 +18,15 @@ namespace API.Services.ServiceBus
         private readonly ILogger<ServiceBusReceiver> logger;
         private readonly UserLocationsService userLocationsService;
         private readonly AzureBlobService azureBlobService;
+        private readonly LocationDbContext locationDbContext;
 
         public LocationCreatedReceiver(IOptions<AzureServiceBusOptions> options, ILogger<ServiceBusReceiver> logger,
-            UserLocationsService userLocationsService, AzureBlobService azureBlobService) : base(options, logger)
+            UserLocationsService userLocationsService, AzureBlobService azureBlobService, LocationDbContext locationDbContext) : base(options, logger)
         {
             this.logger = logger;
             this.userLocationsService = userLocationsService;
             this.azureBlobService = azureBlobService;
+            this.locationDbContext = locationDbContext;
         }
 
         public override async Task ProcessEventAsync(LocationsCreatedMessage message, CancellationToken cancellationToken)
@@ -56,6 +59,13 @@ namespace API.Services.ServiceBus
 
                         Directory.Delete(folderPath, true);
                         await azureBlobService.DeleteFile(userId);
+
+                        var user = locationDbContext.Users.FirstOrDefault(s => s.UserIdentifier == userId);
+                        if(user != null)
+                        {
+                            user.Status = Database.Entities.Status.Done;
+                            await locationDbContext.SaveChangesAsync();
+                        }
                     }
                 }
             }

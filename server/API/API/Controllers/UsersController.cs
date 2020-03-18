@@ -155,7 +155,7 @@ namespace API.Controllers
 
                     locationDbContext.Users.Add(new Database.Entities.User
                     {
-                        Status = Database.Entities.Status.Undefined,
+                        Status = Database.Entities.Status.InProgress,
                         Token = token.ToString(),
                         UserIdentifier = userId
                     });
