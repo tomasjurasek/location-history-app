@@ -47,7 +47,8 @@ namespace API
                 options.UseSqlServer(Configuration.GetConnectionString("Database"));
             });
 
-            services.AddHostedService<FileParseBackgroundService>();
+            // used Azure Function to process the message instead of FileParseBackgroundService
+            //services.AddHostedService<FileParseBackgroundService>();
             services.Configure<AmazonOptions>(Configuration.GetSection("Amazon"));
             services.Configure<AzureBlobServiceOptions>(Configuration.GetSection("Azure"));
             services.Configure<AzureServiceBusOptions>(Configuration.GetSection("Azure"));

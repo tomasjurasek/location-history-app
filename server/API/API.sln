@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "Services\Servic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileParserWebjob", "FileParserWebjob\FileParserWebjob.csproj", "{76440417-B498-4670-BF12-09E3ED4855C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database", "Database\Database.csproj", "{3248C209-B11A-413A-AF17-7CF6839B8DCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Database", "Database\Database.csproj", "{3248C209-B11A-413A-AF17-7CF6839B8DCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocationHistoryParserFunction", "LocationHistoryParserFunction\LocationHistoryParserFunction.csproj", "{F63793B4-A81B-43CB-B29B-6343445B33D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{3248C209-B11A-413A-AF17-7CF6839B8DCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3248C209-B11A-413A-AF17-7CF6839B8DCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3248C209-B11A-413A-AF17-7CF6839B8DCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F63793B4-A81B-43CB-B29B-6343445B33D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F63793B4-A81B-43CB-B29B-6343445B33D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F63793B4-A81B-43CB-B29B-6343445B33D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F63793B4-A81B-43CB-B29B-6343445B33D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

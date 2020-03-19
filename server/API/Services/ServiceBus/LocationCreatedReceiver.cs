@@ -12,7 +12,6 @@ namespace API.Services.ServiceBus
 {
     public class LocationCreatedReceiver : ServiceBusReceiver
     {
-        private readonly IOptions<AzureServiceBusOptions> options;
         private readonly UserLocationsService userLocationsService;
         private readonly AzureBlobService azureBlobService;
         private readonly IServiceScopeFactory serviceScopeFactory;
@@ -22,7 +21,6 @@ namespace API.Services.ServiceBus
             UserLocationsService userLocationsService, AzureBlobService azureBlobService, IServiceScopeFactory serviceScopeFactory,
             ILoggerFactory loggerFactory) : base(options, logger)
         {
-            this.options = options;
             this.userLocationsService = userLocationsService;
             this.azureBlobService = azureBlobService;
             this.serviceScopeFactory = serviceScopeFactory;
@@ -34,7 +32,7 @@ namespace API.Services.ServiceBus
             using (var scope = serviceScopeFactory.CreateScope())
             {
                 var locationDbContext = scope.ServiceProvider.GetRequiredService<LocationDbContext>();
-                var locationMessageProcessor = new LocationMessageProcessor(options, loggerFactory.CreateLogger<LocationMessageProcessor>(), userLocationsService, azureBlobService, locationDbContext);
+                var locationMessageProcessor = new LocationMessageProcessor(loggerFactory.CreateLogger<LocationMessageProcessor>(), userLocationsService, azureBlobService, locationDbContext);
                 await locationMessageProcessor.ProcessAsync(message, cancellationToken);
             }
         }
