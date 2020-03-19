@@ -15,7 +15,8 @@ namespace API.Services.ServiceBus
         public ServiceBusSender(IOptions<AzureServiceBusOptions> options)
         {
             var cs = options.Value.ServiceBus;
-            _queueClient = new QueueClient(cs, "locationfilequeue");
+            var queueName = options.Value.QueueName;
+            _queueClient = new QueueClient(cs, queueName);
         }
 
         public virtual Task SendMessageAsync(LocationsCreatedMessage messageBody)

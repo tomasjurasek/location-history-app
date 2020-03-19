@@ -19,7 +19,8 @@ namespace API.Services.ServiceBus
         public ServiceBusReceiver(IOptions<AzureServiceBusOptions> options, ILogger<ServiceBusReceiver> logger)
         {
             var cs = options.Value.ServiceBus;
-            _queueClient = new QueueClient(cs, "locationfilequeue");
+            var queueName = options.Value.QueueName;
+            _queueClient = new QueueClient(cs, queueName);
             this.logger = logger;
         }
 
