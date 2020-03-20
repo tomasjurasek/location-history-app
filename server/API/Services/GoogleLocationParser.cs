@@ -2,21 +2,22 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace Services
 {
     public class GoogleLocationParser
     {
-        public IEnumerable<Locations> Parse(string jsonFilePath)
+        public IEnumerable<Locations> Parse(byte[] data)
         {
             var response = new List<Locations>();
             GoogleRootObject jsonData;
 
-            using (StreamReader file = File.OpenText(jsonFilePath))
+            using (var reader = new StreamReader(new MemoryStream(data), Encoding.UTF8))
             {
                 var serializer = new JsonSerializer();
-                jsonData = (GoogleRootObject)serializer.Deserialize(file, typeof(GoogleRootObject));
+                jsonData = (GoogleRootObject)serializer.Deserialize(reader, typeof(GoogleRootObject));
             }
 
             foreach (var item in jsonData.Locations)

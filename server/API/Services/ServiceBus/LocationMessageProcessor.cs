@@ -2,6 +2,8 @@
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using API.Services.ServiceBus;
@@ -41,32 +43,10 @@ namespace Services.ServiceBus
                     if (stream != null)
                     {
                         stream.Position = 0;
-                        folderPath = Path.Combine(Directory.GetCurrentDirectory(), userId);
-                        logger.LogInformation("Creating directory '{DirectoryName}'.", folderPath);
-                        Directory.CreateDirectory(folderPath);
-                        logger.LogInformation("Directory '{DirectoryName}' successfully created.", folderPath);
+                        var data = GetLocationHistoryDataFromZipStream(stream);
 
-                        var uploadedFilePath = Path.Combine(folderPath, $"{userId}.zip");
-                        logger.LogInformation("Creating file '{FilePath}'.", uploadedFilePath);
-
-                        using (var fileStream = File.Create(uploadedFilePath))
-                        {
-                            await stream.CopyToAsync(fileStream);
-                            logger.LogInformation("File '{FilePath}' successfully created.", uploadedFilePath);
-                        }
-
-                        var extractedDirectoryPath = Path.Combine(folderPath, "data");
-                        logger.LogInformation("Creating directory '{DirectoryName}'.", extractedDirectoryPath);
-                        Directory.CreateDirectory(extractedDirectoryPath);
-
-                        logger.LogInformation("Extracting uploaded zip file into '{DirectoryName}'.", extractedDirectoryPath);
-                        ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath);
-
-                        var jsonFilePath = GetJsonFilePath(extractedDirectoryPath);
-                        logger.LogInformation("JSON with takeout found: '{FilePath}'.", jsonFilePath);
-
-                        logger.LogInformation("Processing JSON file '{FilePath}'.", jsonFilePath);
-                        await userLocationsService.CreateUserLocationsAsync(userId, jsonFilePath);
+                        logger.LogInformation("Processing location data.");
+                        await userLocationsService.CreateUserLocationsAsync(userId, data);
 
                         logger.LogInformation("Getting user info from DB.");
                         // TODO: change FirstOrDefault to SingleOrDefault and add unique index to UserIdentifier
@@ -75,6 +55,10 @@ namespace Services.ServiceBus
                         {
                             user.Status = Status.Done;
                         }
+                    }
+                    else
+                    {
+                        logger.LogWarning("No data downloaded from Azure Blob Storage.");
                     }
                 }
             }
@@ -107,55 +91,27 @@ namespace Services.ServiceBus
             }
         }
 
-        private string GetJsonFilePath(string directoryPath)
+        private static byte[] GetLocationHistoryDataFromZipStream(Stream stream)
         {
-            var jsonPathEn = Path.Combine(directoryPath, "Takeout", "Location History", "Location History.json");
-            var jsonPathCz = Path.Combine(directoryPath, "Takeout", "Historie polohy", "Historie polohy.json");
-
-            if (File.Exists(jsonPathEn))
+            using (var archive = new ZipArchive(stream))
             {
-                return jsonPathEn;
-            }
+                var regexp = @"Takeout\/.*\/.*\.json";
+                var locationHistoryEntry = archive.Entries.SingleOrDefault(entry =>
+                    Regex.Match(entry.FullName, regexp, RegexOptions.IgnoreCase).Success);
 
-            if (File.Exists(jsonPathCz))
-            {
-                return jsonPathCz;
-            }
-
-            if (!TryGetSingleJsonFile(directoryPath, out var finalJsonPath))
-            {
-                throw new Exception($"JSON file with location history not found in '{directoryPath}'.");
-            }
-
-            return finalJsonPath;
-        }
-
-        private bool TryGetSingleJsonFile(string directoryPath, out string jsonFilePath)
-        {
-            var dir = new DirectoryInfo(directoryPath);
-            var files = dir.EnumerateFiles("*.json", SearchOption.TopDirectoryOnly).ToList();
-            if (files.Count == 1)
-            {
-                jsonFilePath = files.Single().FullName;
-                return true;
-            }
-
-            if (files.Count > 1)
-            {
-                jsonFilePath = default;
-                return false;
-            }
-
-            foreach (var subdir in dir.EnumerateDirectories())
-            {
-                if (TryGetSingleJsonFile(subdir.FullName, out jsonFilePath))
+                if (locationHistoryEntry == null)
                 {
-                    return true;
+                    throw new Exception("JSON file with location history not found in zip archive.");
+                }
+
+                using (var entryStream = locationHistoryEntry.Open())
+                {
+                    using (var reader = new BinaryReader(entryStream))
+                    {
+                        return reader.ReadBytes((int) locationHistoryEntry.Length);
+                    }
                 }
             }
-
-            jsonFilePath = default;
-            return false;
         }
     }
 }
