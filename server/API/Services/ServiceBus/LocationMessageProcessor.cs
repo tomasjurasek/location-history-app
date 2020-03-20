@@ -42,24 +42,34 @@ namespace Services.ServiceBus
                     {
                         stream.Position = 0;
                         folderPath = Path.Combine(Directory.GetCurrentDirectory(), userId);
-                        Directory.CreateDirectory(Path.Combine(folderPath));
-
-                        logger.LogInformation($"File created - {folderPath}");
+                        logger.LogInformation("Creating directory '{DirectoryName}'.", folderPath);
+                        Directory.CreateDirectory(folderPath);
+                        logger.LogInformation("Directory '{DirectoryName}' successfully created.", folderPath);
 
                         var uploadedFilePath = Path.Combine(folderPath, $"{userId}.zip");
+                        logger.LogInformation("Creating file '{FilePath}'.", uploadedFilePath);
 
                         using (var fileStream = File.Create(uploadedFilePath))
                         {
                             await stream.CopyToAsync(fileStream);
+                            logger.LogInformation("File '{FilePath}' successfully created.", uploadedFilePath);
                         }
 
-                        var extractedDirectoryPath = Directory.CreateDirectory(Path.Combine(folderPath, "data"));
-                        ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath.FullName);
+                        var extractedDirectoryPath = Path.Combine(folderPath, "data");
+                        logger.LogInformation("Creating directory '{DirectoryName}'.", extractedDirectoryPath);
+                        Directory.CreateDirectory(extractedDirectoryPath);
 
-                        var jsonData = GetJsonFilePath(extractedDirectoryPath.FullName);
-                        await userLocationsService.CreateUserLocationsAsync(userId, jsonData);
+                        logger.LogInformation("Extracting uploaded zip file into '{DirectoryName}'.", extractedDirectoryPath);
+                        ZipFile.ExtractToDirectory(uploadedFilePath, extractedDirectoryPath);
 
+                        var jsonFilePath = GetJsonFilePath(extractedDirectoryPath);
+                        logger.LogInformation("JSON with takeout found: '{FilePath}'.", jsonFilePath);
 
+                        logger.LogInformation("Processing JSON file '{FilePath}'.", jsonFilePath);
+                        await userLocationsService.CreateUserLocationsAsync(userId, jsonFilePath);
+
+                        logger.LogInformation("Getting user info from DB.");
+                        // TODO: change FirstOrDefault to SingleOrDefault and add unique index to UserIdentifier
                         user = locationDbContext.Users.FirstOrDefault(s => s.UserIdentifier == userId);
                         if (user != null)
                         {
@@ -70,7 +80,7 @@ namespace Services.ServiceBus
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Processing failed for user - {userId}");
+                logger.LogError(ex, "Processing failed for user {UserId}.", userId);
                 if (user != null)
                 {
                     user.Status = Status.Failed;
@@ -86,11 +96,13 @@ namespace Services.ServiceBus
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError(ex, $"Delete file failed for user - {userId}");
+                        logger.LogError(ex, "Deleting of directory {DirectoryName} failed for user {UserId}.", folderPath, userId);
                     }
                 }
 
+                logger.LogInformation("Deleting file from Azure Blob Storage for user {UserId}", userId);
                 await azureBlobService.DeleteFile(userId);
+
                 await locationDbContext.SaveChangesAsync();
             }
         }
