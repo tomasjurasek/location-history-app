@@ -20,6 +20,7 @@ namespace LocationHistoryParserFunction
             builder.Services.AddDbContext<LocationDbContext>(
                 options => options.UseSqlServer(connectionString));
 
+            builder.Services.AddLogging();
             builder.Services.AddTransient<LocationMessageProcessor>();
             builder.Services.AddTransient<UserLocationsService>();
             builder.Services.AddTransient<AzureBlobService>();
