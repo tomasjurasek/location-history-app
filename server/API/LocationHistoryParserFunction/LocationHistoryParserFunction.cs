@@ -1,6 +1,9 @@
+using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using API.Services.ServiceBus;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -18,13 +21,14 @@ namespace LocationHistoryParserFunction
         }
 
         [FunctionName("LocationHistoryParserFunction")]
-        public Task Run([ServiceBusTrigger("development", Connection = "ServiceBusConnection")]
-            string queueMessage, ILogger logger)
+        public Task Run([ServiceBusTrigger("locationfilequeue", Connection = "ServiceBusConnection")]
+            Message message, ILogger logger)
         {
-            logger.LogInformation($">>> Processing message: {queueMessage}");
+            var messageBody = Encoding.UTF8.GetString(message.Body);
+            logger.LogInformation(">>> Processing message '{MessageBody}' {EnqueuedTimeUtc}", messageBody, message.SystemProperties.EnqueuedTimeUtc);
 
-            var message = JsonConvert.DeserializeObject<LocationsCreatedMessage>(queueMessage);
-            return locationMessageProcessor.ProcessAsync(message, CancellationToken.None);
+            var messageData = JsonConvert.DeserializeObject<LocationsCreatedMessage>(messageBody);
+            return locationMessageProcessor.ProcessAsync(messageData, CancellationToken.None);
         }
     }
 }
