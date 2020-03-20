@@ -15,12 +15,10 @@ namespace Services
             this.amazonService = amazonService;
         }
 
-        public async Task<IEnumerable<Locations>> CreateUserLocationsAsync(string userId, string jsonFilePath)
+        public Task CreateUserLocationsAsync(string userId, string jsonFilePath)
         {
-            var locations = googleLocationParser.Parse(jsonFilePath).ToList();
-            await amazonService.UploadCsvData(userId, locations);
-           
-            return locations;
+            var locations = googleLocationParser.Parse(jsonFilePath);
+            return amazonService.UploadCsvData(userId, locations);
         }
     }
 }
