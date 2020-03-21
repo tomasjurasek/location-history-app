@@ -14,12 +14,13 @@ namespace LocationHistory.API.Services
         {
             this.serviceScopeFactory = serviceScopeFactory;
         }
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             using (var scope = serviceScopeFactory.CreateScope())
             {
                 var service = scope.ServiceProvider.GetRequiredService<LocationCreatedReceiver>();
                 service.RegisterMessageHandler();
+                return Task.CompletedTask;
             }
         }
     }
