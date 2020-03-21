@@ -47,8 +47,8 @@ namespace API.Controllers
         }
 
 
-        [HttpGet("send")]
-        public async Task<ActionResult> Send([FromQuery]string phoneNumber)
+        [HttpPost("send")]
+        public async Task<ActionResult> Send([FromBody]string phoneNumber)
         {
             var userId = $"{RandomString(3)}-{RandomString(3)}-{RandomString(3)}";
             var token = Guid.NewGuid();
