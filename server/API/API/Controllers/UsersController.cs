@@ -152,10 +152,10 @@ namespace API.Controllers
             public bool IsTruncated { get; set; }
         }
 
-        [HttpPost("file")]
+        [HttpPost("{userId}/file")]
         [RequestSizeLimit(104857600)]
         [RequestFormLimits(MultipartBodyLengthLimit = 104857600)]
-        public async Task<ActionResult<UserLocationViewModel>> UploadFileAsync([FromForm] IFormFile file, [FromQuery]string userId, [FromQuery]string verifyCode)
+        public async Task<ActionResult<UserLocationViewModel>> UploadFileAsync([FromForm] IFormFile file, string userId, [FromQuery]string verifyCode)
         {
 
             var user = await locationDbContext.Users.FirstOrDefaultAsync(s => s.UserIdentifier == userId && s.VerifyCode == verifyCode);
@@ -203,7 +203,7 @@ namespace API.Controllers
             }
 
             return NotFound();
-           
+
         }
 
         private static string RandomString(int length)
