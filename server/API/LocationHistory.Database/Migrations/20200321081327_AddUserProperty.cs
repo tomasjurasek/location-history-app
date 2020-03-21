@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Database.Migrations
+namespace LocationHistory.Database.Migrations
 {
     public partial class AddUserProperty : Migration
     {

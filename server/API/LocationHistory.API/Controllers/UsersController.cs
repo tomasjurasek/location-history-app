@@ -1,24 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Amazon.Runtime;
-using API.Models;
-using API.Services;
-using API.Services.ServiceBus;
-using Database;
+using LocationHistory.API.Models;
+using LocationHistory.Database;
+using LocationHistory.Services;
+using LocationHistory.Services.ServiceBus;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Services;
 
-namespace API.Controllers
+namespace LocationHistory.API.Controllers
 {
     [Route("api/users")]
     public partial class UsersController : Controller
@@ -60,9 +57,9 @@ namespace API.Controllers
             var response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                locationDbContext.Users.Add(new Database.Entities.User
+                locationDbContext.Users.Add(new global::LocationHistory.Database.Entities.User
                 {
-                    Status = Database.Entities.Status.InProgress,
+                    Status = global::LocationHistory.Database.Entities.Status.InProgress,
                     Token = token.ToString(),
                     Phone = phoneNumber,
                     UserIdentifier = userId,
@@ -106,7 +103,7 @@ namespace API.Controllers
                     return locations;
                 }
 
-                if (user.Status == Database.Entities.Status.InProgress)
+                if (user.Status == global::LocationHistory.Database.Entities.Status.InProgress)
                 {
                     return NoContent();
                 }

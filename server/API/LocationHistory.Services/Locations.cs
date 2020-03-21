@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Services
+namespace LocationHistory.Services
 {
     public class Locations
     {

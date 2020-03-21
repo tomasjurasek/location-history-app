@@ -1,16 +1,17 @@
 ﻿using System;
-using Database;
+using LocationHistory.Database;
+using LocationHistory.Functions;
+using LocationHistory.Services;
+using LocationHistory.Services.Options;
+using LocationHistory.Services.ServiceBus;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Services;
-using Services.Options;
-using Services.ServiceBus;
 
-[assembly: FunctionsStartup(typeof(LocationHistoryParserFunction.Startup))]
+[assembly: FunctionsStartup(typeof(Startup))]
 
-namespace LocationHistoryParserFunction
+namespace LocationHistory.Functions
 {
     public class Startup : FunctionsStartup
     {

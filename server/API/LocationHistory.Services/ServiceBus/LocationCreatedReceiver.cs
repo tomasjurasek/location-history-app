@@ -1,14 +1,12 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Database;
+using LocationHistory.Database;
+using LocationHistory.Services.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Services;
-using Services.Options;
-using Services.ServiceBus;
 
-namespace API.Services.ServiceBus
+namespace LocationHistory.Services.ServiceBus
 {
     public class LocationCreatedReceiver : ServiceBusReceiver
     {

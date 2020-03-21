@@ -1,6 +1,6 @@
-using API.Services;
-using API.Services.ServiceBus;
-using Database;
+using LocationHistory.Database;
+using LocationHistory.Services.Extensions;
+using LocationHistory.Services.Options;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -8,12 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Services;
-using Services.Extensions;
-using Services.Options;
-using System;
 
-namespace API
+namespace LocationHistory.API
 {
     public class Startup
     {

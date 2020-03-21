@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Threading.Tasks;
+using LocationHistory.Services.Options;
 using Microsoft.Extensions.Options;
-using Services.Options;
-using System.Threading.Tasks;
 
-namespace API.Services.ServiceBus
+namespace LocationHistory.Services.ServiceBus
 {
     public class LocationCreatedSender : ServiceBusSender
     {

@@ -2,16 +2,14 @@
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using API.Services.ServiceBus;
-using Database;
-using Database.Entities;
+using LocationHistory.Database;
+using LocationHistory.Database.Entities;
 using Microsoft.Extensions.Logging;
 
-namespace Services.ServiceBus
+namespace LocationHistory.Services.ServiceBus
 {
     public class LocationMessageProcessor
     {

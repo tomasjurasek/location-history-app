@@ -1,11 +1,10 @@
-﻿using API.Services.ServiceBus;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using LocationHistory.Services.ServiceBus;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace API.Services
+namespace LocationHistory.API.Services
 {
     public class FileParseBackgroundService : BackgroundService
     {

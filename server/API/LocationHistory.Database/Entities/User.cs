@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Database.Entities
+namespace LocationHistory.Database.Entities
 {
     public class User
     {

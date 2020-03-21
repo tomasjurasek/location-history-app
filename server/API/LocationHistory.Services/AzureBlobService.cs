@@ -1,14 +1,10 @@
-﻿using Azure.Storage.Blobs;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Services.Options;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
+using LocationHistory.Services.Options;
+using Microsoft.Extensions.Options;
 
-namespace Services
+namespace LocationHistory.Services
 {
     public class AzureBlobService
     {

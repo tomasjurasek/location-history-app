@@ -1,15 +1,14 @@
-﻿using Microsoft.Azure.ServiceBus;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Services.Options;
-using System;
+﻿using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using LocationHistory.Services.Options;
+using Microsoft.Azure.ServiceBus;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
-namespace API.Services.ServiceBus
+namespace LocationHistory.Services.ServiceBus
 {
     public abstract class ServiceBusReceiver
     {

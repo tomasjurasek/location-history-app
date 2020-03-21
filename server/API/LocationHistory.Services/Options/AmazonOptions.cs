@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Services.Options
+﻿namespace LocationHistory.Services.Options
 {
     public class AmazonOptions
     {

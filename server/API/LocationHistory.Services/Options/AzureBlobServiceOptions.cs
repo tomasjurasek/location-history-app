@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Services.Options
+﻿namespace LocationHistory.Services.Options
 {
     public class AzureBlobServiceOptions
     {

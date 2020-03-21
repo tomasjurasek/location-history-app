@@ -1,10 +1,7 @@
-﻿using Database.Entities;
+﻿using LocationHistory.Database.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Database
+namespace LocationHistory.Database
 {
     public class LocationDbContext : DbContext
     {

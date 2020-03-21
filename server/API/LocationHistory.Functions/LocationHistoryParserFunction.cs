@@ -1,15 +1,13 @@
-using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using API.Services.ServiceBus;
+using LocationHistory.Services.ServiceBus;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Services.ServiceBus;
 
-namespace LocationHistoryParserFunction
+namespace LocationHistory.Functions
 {
     public class LocationHistoryParserFunction
     {

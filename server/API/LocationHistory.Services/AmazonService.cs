@@ -1,17 +1,16 @@
-﻿using Amazon;
-using Amazon.S3;
-using Amazon.S3.Transfer;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Services.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Amazon;
+using Amazon.S3;
+using Amazon.S3.Transfer;
+using LocationHistory.Services.Options;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
-namespace Services
+namespace LocationHistory.Services
 {
 
     public class AmazonService

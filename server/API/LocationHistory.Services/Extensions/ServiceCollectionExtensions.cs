@@ -1,11 +1,7 @@
-﻿using API.Services;
-using API.Services.ServiceBus;
+﻿using LocationHistory.Services.ServiceBus;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Services.Extensions
+namespace LocationHistory.Services.Extensions
 {
     public static class ServiceCollectionExtensions
     {
