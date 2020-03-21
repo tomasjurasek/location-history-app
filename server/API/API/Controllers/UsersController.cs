@@ -166,7 +166,7 @@ namespace API.Controllers
                 var response = new UserLocationViewModel
                 {
                     Id = userId,
-                    Token = token.ToString()
+                    Token = user.Token
                 };
 
                 if (file == null)
