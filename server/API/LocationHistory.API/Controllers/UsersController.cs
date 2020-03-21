@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,6 +27,8 @@ namespace LocationHistory.API.Controllers
         private readonly LocationCreatedSender locationCreatedSender;
         private readonly LocationDbContext locationDbContext;
         private readonly AmazonService amazonService;
+
+        protected ConcurrentDictionary<string, int> userSmSTreshhold { get; set; } = new ConcurrentDictionary<string, int>();
 
         public UsersController(ILogger<UsersController> logger,
             IConfiguration config,
@@ -58,6 +61,13 @@ namespace LocationHistory.API.Controllers
         [HttpPost("send")]
         public async Task<ActionResult> Send([FromBody]string phoneNumber)
         {
+
+            userSmSTreshhold.TryGetValue(phoneNumber, out var smsCount);
+
+            if (smsCount >= 3)
+            {
+                return BadRequest();
+            }
             var userId = $"{RandomString(3)}-{RandomString(3)}-{RandomString(3)}";
             var token = Guid.NewGuid();
             var client = new HttpClient();
@@ -79,6 +89,7 @@ namespace LocationHistory.API.Controllers
                 });
 
                 await locationDbContext.SaveChangesAsync();
+                userSmSTreshhold.AddOrUpdate(phoneNumber, 1, (key, count) => count + 1);
 
                 return Ok(userId);
             }
