@@ -8,8 +8,7 @@
       "Host.Results": "Error",
       "Function": "Information",
       "Host.Aggregator": "Information",
-      "Services.ServiceBus.LocationMessageProcessor": "Information",
-      "Services.AmazonService": "Information"
+      "LocationHistory": "Trace"
     }
   },
   "extensions": {
