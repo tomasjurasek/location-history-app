@@ -49,7 +49,7 @@ namespace API.Controllers
         [HttpGet("{userId}/verify")]
         public async Task<ActionResult> Verify(string userId, [FromQuery]string verifyCode)
         {
-            var user = await locationDbContext.Users.FirstOrDefaultAsync(s => s.UserIdentifier == userId && s.VerifyCode == verifyCode);
+            var user = await locationDbContext.Users.FirstOrDefaultAsync(s => s.UserIdentifier == userId && s.VerifyCode == verifyCode.ToUpper());
             if (user != null)
             {
                 return Ok();
@@ -169,7 +169,7 @@ namespace API.Controllers
         public async Task<ActionResult<UserLocationViewModel>> UploadFileAsync([FromForm] IFormFile file, string userId, [FromQuery]string verifyCode)
         {
 
-            var user = await locationDbContext.Users.FirstOrDefaultAsync(s => s.UserIdentifier == userId && s.VerifyCode == verifyCode);
+            var user = await locationDbContext.Users.FirstOrDefaultAsync(s => s.UserIdentifier == userId && s.VerifyCode == verifyCode.ToUpper());
 
             if (user != null)
             {
