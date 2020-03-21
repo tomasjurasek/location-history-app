@@ -7,9 +7,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using LocationHistory.Database;
 using LocationHistory.Database.Entities;
+using LocationHistory.Services.ServiceBus;
 using Microsoft.Extensions.Logging;
 
-namespace LocationHistory.Services.ServiceBus
+namespace LocationHistory.Services
 {
     public class LocationMessageProcessor
     {
