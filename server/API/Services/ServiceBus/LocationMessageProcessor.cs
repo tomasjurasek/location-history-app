@@ -109,6 +109,8 @@ namespace Services.ServiceBus
                     throw new Exception("JSON file with location history not found in zip archive.");
                 }
 
+                logger.LogInformation("Uncompressing zip archive entry: {ZipArchiveEntry}", locationHistoryEntry.FullName);
+
                 using (var entryStream = locationHistoryEntry.Open())
                 {
                     using (var reader = new BinaryReader(entryStream))
