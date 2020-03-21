@@ -1,6 +1,17 @@
 {
   "version": "2.0",
   "functionTimeout": "00:10:00",
+  "logging": {
+    "fileLoggingMode": "always",
+    "logLevel": {
+      "default": "Warning",
+      "Host.Results": "Error",
+      "Function": "Information",
+      "Host.Aggregator": "Information",
+      "Services.ServiceBus.LocationMessageProcessor": "Information",
+      "Services.AmazonService": "Information"
+    }
+  },
   "extensions": {
     "serviceBus": {
       "prefetchCount": 100,
