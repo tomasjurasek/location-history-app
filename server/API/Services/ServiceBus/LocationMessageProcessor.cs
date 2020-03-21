@@ -100,7 +100,7 @@ namespace Services.ServiceBus
                     logger.LogInformation("Zip archive entry: {ZipArchiveEntry}", entry.FullName);
                 }
 
-                var regexp = @"Takeout\/.*\/.*\.json";
+                var regexp = @"Takeout\/[^\/]+\/[^\/]+\.json";
                 var locationHistoryEntry = archive.Entries.SingleOrDefault(entry =>
                     Regex.Match(entry.FullName, regexp, RegexOptions.IgnoreCase).Success);
 
