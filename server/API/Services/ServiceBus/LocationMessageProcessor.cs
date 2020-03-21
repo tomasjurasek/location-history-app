@@ -91,10 +91,15 @@ namespace Services.ServiceBus
             }
         }
 
-        private static byte[] GetLocationHistoryDataFromZipStream(Stream stream)
+        private byte[] GetLocationHistoryDataFromZipStream(Stream stream)
         {
             using (var archive = new ZipArchive(stream))
             {
+                foreach (var entry in archive.Entries)
+                {
+                    logger.LogInformation("Zip archive entry: {ZipArchiveEntry}", entry.FullName);
+                }
+
                 var regexp = @"Takeout\/.*\/.*\.json";
                 var locationHistoryEntry = archive.Entries.SingleOrDefault(entry =>
                     Regex.Match(entry.FullName, regexp, RegexOptions.IgnoreCase).Success);
