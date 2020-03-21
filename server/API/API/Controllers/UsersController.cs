@@ -46,6 +46,17 @@ namespace API.Controllers
             this.amazonService = amazonService;
         }
 
+        [HttpGet("{userId}/verify")]
+        public async Task<ActionResult> Verify(string userId, [FromQuery]string verifyCode)
+        {
+            var user = await locationDbContext.Users.FirstOrDefaultAsync(s => s.UserIdentifier == userId && s.VerifyCode == verifyCode);
+            if (user != null)
+            {
+                return Ok();
+            }
+
+            return NotFound();
+        }
 
         [HttpPost("send")]
         public async Task<ActionResult> Send([FromBody]string phoneNumber)
