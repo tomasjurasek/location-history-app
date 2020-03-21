@@ -46,6 +46,38 @@ namespace API.Controllers
             this.amazonService = amazonService;
         }
 
+
+        [HttpGet("send")]
+        public async Task<ActionResult> Send([FromQuery]string phoneNumber)
+        {
+            var userId = $"{RandomString(3)}-{RandomString(3)}-{RandomString(3)}";
+            var token = Guid.NewGuid();
+            var client = new HttpClient();
+            var verifyCode = RandomString(5);
+            var smsToken = config.GetValue<string>("SmsToken");
+            var smsUrl = config.GetValue<string>("SmsUrl");
+            var url = string.Format(smsUrl, smsToken, phoneNumber, verifyCode);
+            var response = await client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                locationDbContext.Users.Add(new Database.Entities.User
+                {
+                    Status = Database.Entities.Status.InProgress,
+                    Token = token.ToString(),
+                    Phone = phoneNumber,
+                    UserIdentifier = userId,
+                    VerifyCode = verifyCode,
+                    CreatedDateTime = DateTime.UtcNow
+                });
+
+                await locationDbContext.SaveChangesAsync();
+
+                return Ok(userId);
+            }
+
+            return BadRequest();
+
+        }
         [HttpGet("{userId}/locations")]
         public async Task<ActionResult<IList<LocationViewModel>>> Get(string userId, [FromQuery]string token)
         {
@@ -123,55 +155,55 @@ namespace API.Controllers
         [HttpPost("file")]
         [RequestSizeLimit(104857600)]
         [RequestFormLimits(MultipartBodyLengthLimit = 104857600)]
-        public async Task<ActionResult<UserLocationViewModel>> UploadFileAsync([FromForm] IFormFile file)
+        public async Task<ActionResult<UserLocationViewModel>> UploadFileAsync([FromForm] IFormFile file, [FromQuery]string userId, [FromQuery]string verifyCode)
         {
-            var userId = $"{RandomString(3)}-{RandomString(3)}-{RandomString(3)}";
-            var token = Guid.NewGuid();
-            var response = new UserLocationViewModel
-            {
-                Id = userId,
-                Token = token.ToString()
-            };
 
-            if (file == null)
-            {
-                return BadRequest("No file has been uploaded.");
-            }
+            var user = await locationDbContext.Users.FirstOrDefaultAsync(s => s.UserIdentifier == userId && s.VerifyCode == verifyCode);
 
-            if (!IsFileLengthValid(file))
+            if (user != null)
             {
-                return BadRequest("File size exceeded configured limit.");
-            }
-
-            try
-            {
-                using (Stream stream = new MemoryStream())
+                var token = Guid.NewGuid();
+                var response = new UserLocationViewModel
                 {
-                    await file.CopyToAsync(stream);
-                    stream.Position = 0;
-                    await azureBlobService.UploadFile(userId, stream);
-                    await locationCreatedSender.SendMessageAsync(new LocationsCreatedMessage
-                    {
-                        UserId = userId
-                    });
+                    Id = userId,
+                    Token = token.ToString()
+                };
 
-                    locationDbContext.Users.Add(new Database.Entities.User
-                    {
-                        Status = Database.Entities.Status.InProgress,
-                        Token = token.ToString(),
-                        UserIdentifier = userId
-                    });
-                    await locationDbContext.SaveChangesAsync();
+                if (file == null)
+                {
+                    return BadRequest("No file has been uploaded.");
                 }
 
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Processing of uploaded file failed.", ex);
+                if (!IsFileLengthValid(file))
+                {
+                    return BadRequest("File size exceeded configured limit.");
+                }
+
+                try
+                {
+                    using (Stream stream = new MemoryStream())
+                    {
+                        await file.CopyToAsync(stream);
+                        stream.Position = 0;
+                        await azureBlobService.UploadFile(userId, stream);
+                        await locationCreatedSender.SendMessageAsync(new LocationsCreatedMessage
+                        {
+                            UserId = userId
+                        });
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Processing of uploaded file failed.", ex);
+                }
+
+                return response;
+
             }
 
-
-            return response;
+            return NotFound();
+           
         }
 
         private static string RandomString(int length)
