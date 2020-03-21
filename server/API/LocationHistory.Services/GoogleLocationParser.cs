@@ -3,12 +3,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace LocationHistory.Services
 {
     public class GoogleLocationParser
     {
+        private readonly ILogger<GoogleLocationParser> logger;
+
+        public GoogleLocationParser(ILogger<GoogleLocationParser> logger)
+        {
+            this.logger = logger;
+        }
+
         public IEnumerable<Locations> Parse(byte[] data)
         {
             var response = new List<Locations>();
@@ -17,6 +25,7 @@ namespace LocationHistory.Services
             using (var reader = new StreamReader(new MemoryStream(data), Encoding.UTF8))
             {
                 var serializer = new JsonSerializer();
+                logger.LogTrace($"Deserializing data into {nameof(GoogleRootObject)}.");
                 jsonData = (GoogleRootObject)serializer.Deserialize(reader, typeof(GoogleRootObject));
             }
 
@@ -33,6 +42,7 @@ namespace LocationHistory.Services
 
             var threeWeeksAgo = DateTime.UtcNow.AddDays(-21);
 
+            logger.LogTrace($"Filtering locations (>= {threeWeeksAgo}).");
             return response
                 .Where(s => s.DateTimeUtc >= threeWeeksAgo)
                 .OrderBy(s => s.DateTimeUtc);

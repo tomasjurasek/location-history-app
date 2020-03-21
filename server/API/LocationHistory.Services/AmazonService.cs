@@ -40,6 +40,7 @@ namespace LocationHistory.Services
                         CannedACL = S3CannedACL.Private
                     };
 
+                    logger.LogInformation("Uploading data into Amazaon S3 for {UserId}", userId);
                     var fileTransferUtility = new TransferUtility(client);
                     await fileTransferUtility.UploadAsync(uploadRequest);
                 }
@@ -57,6 +58,8 @@ namespace LocationHistory.Services
             var response = new List<Locations>();
             try
             {
+                logger.LogInformation("Start: Get locations from Amazon S3 for {UserId}", userId);
+
                 using (var client = new AmazonS3Client(amazonOptions.Value.Key, amazonOptions.Value.Secret, RegionEndpoint.EUCentral1))
                 {
                     var folder = Path.Combine(Directory.GetCurrentDirectory(), $"amazon-{userId}");
@@ -77,6 +80,7 @@ namespace LocationHistory.Services
                     Directory.Delete(folder, true);
                 }
 
+                logger.LogInformation("Finish: Get locations from Amazon S3 for {UserId}", userId);
             }
             catch (Exception ex)
             {

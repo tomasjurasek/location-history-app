@@ -33,10 +33,10 @@ namespace LocationHistory.Services
         public async Task ProcessAsync(LocationsCreatedMessage message, CancellationToken cancellationToken)
         {
             var userId = message.UserId;
-            string folderPath = string.Empty;
             User user = null;
             try
             {
+                logger.LogInformation("Downloading file from Azure Blob Storage for user {UserId}.", userId);
                 using (var stream = await azureBlobService.DownloadFile(userId))
                 {
                     if (stream != null)
@@ -71,22 +71,11 @@ namespace LocationHistory.Services
             }
             finally
             {
-                if (!string.IsNullOrEmpty(folderPath))
-                {
-                    try
-                    {
-                        Directory.Delete(folderPath, true);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, "Deleting of directory {DirectoryName} failed for user {UserId}.", folderPath, userId);
-                    }
-                }
-
                 logger.LogInformation("Deleting file from Azure Blob Storage for user {UserId}", userId);
                 await azureBlobService.DeleteFile(userId);
 
-                await locationDbContext.SaveChangesAsync();
+                logger.LogInformation("Saving user info int DB for user {UserId}", userId);
+                await locationDbContext.SaveChangesAsync(cancellationToken);
             }
         }
 
@@ -96,7 +85,7 @@ namespace LocationHistory.Services
             {
                 foreach (var entry in archive.Entries)
                 {
-                    logger.LogInformation("Zip archive entry: {ZipArchiveEntry}", entry.FullName);
+                    logger.LogTrace("Zip archive entry: {ZipArchiveEntry}", entry.FullName);
                 }
 
                 var regexp = @"Takeout\/[^\/]+\/[^\/]+\.json";

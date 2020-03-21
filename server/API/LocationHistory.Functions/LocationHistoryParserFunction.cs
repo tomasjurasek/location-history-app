@@ -20,14 +20,15 @@ namespace LocationHistory.Functions
         }
 
         [FunctionName("LocationHistoryParserFunction")]
-        public Task Run([ServiceBusTrigger("locationfilequeue", Connection = "ServiceBusConnection")]
+        public async Task Run([ServiceBusTrigger("locationfilequeue", Connection = "ServiceBusConnection")]
             Message message, ILogger logger)
         {
             var messageBody = Encoding.UTF8.GetString(message.Body);
-            logger.LogInformation(">>> Processing message '{MessageBody}' {EnqueuedTimeUtc}", messageBody, message.SystemProperties.EnqueuedTimeUtc);
+            logger.LogInformation(">>> Processing message '{MessageBody}' {EnqueuedTimeUtc}.", messageBody, message.SystemProperties.EnqueuedTimeUtc);
 
             var messageData = JsonConvert.DeserializeObject<LocationsCreatedMessage>(messageBody);
-            return locationMessageProcessor.ProcessAsync(messageData, CancellationToken.None);
+            await locationMessageProcessor.ProcessAsync(messageData, CancellationToken.None);
+            logger.LogInformation(">>> Finished processing of message '{MessageBody}'.", messageBody);
         }
     }
 }
