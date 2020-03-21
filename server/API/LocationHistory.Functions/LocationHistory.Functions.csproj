@@ -10,7 +10,7 @@
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.5" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Services\Services.csproj" />
+    <ProjectReference Include="..\LocationHistory.Services\LocationHistory.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

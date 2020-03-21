@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Database\Database.csproj" />
+    <ProjectReference Include="..\LocationHistory.Database\LocationHistory.Database.csproj" />
   </ItemGroup>
 
 </Project>

@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Database\Database.csproj" />
-    <ProjectReference Include="..\Services\Services.csproj" />
+    <ProjectReference Include="..\LocationHistory.Database\LocationHistory.Database.csproj" />
+    <ProjectReference Include="..\LocationHistory.Services\LocationHistory.Services.csproj" />
   </ItemGroup>
 
 
