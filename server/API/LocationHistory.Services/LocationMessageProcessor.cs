@@ -33,31 +33,29 @@ namespace LocationHistory.Services
         public async Task ProcessAsync(LocationsCreatedMessage message, CancellationToken cancellationToken)
         {
             var userId = message.UserId;
-            User user = null;
+            User user = locationDbContext.Users.FirstOrDefault(s => s.UserIdentifier == userId);
             try
             {
-                logger.LogInformation("Downloading file from Azure Blob Storage for user {UserId}.", userId);
-                using (var stream = await azureBlobService.DownloadFile(userId))
+                if (user != null)
                 {
-                    if (stream != null)
+                    logger.LogInformation("Downloading file from Azure Blob Storage for user {UserId}.", userId);
+                    using (var stream = await azureBlobService.DownloadFile(userId))
                     {
-                        stream.Position = 0;
-                        var data = GetLocationHistoryDataFromZipStream(stream);
-
-                        logger.LogInformation("Processing location data.");
-                        await userLocationsService.CreateUserLocationsAsync(userId, data);
-
-                        logger.LogInformation("Getting user info from DB.");
-                        // TODO: change FirstOrDefault to SingleOrDefault and add unique index to UserIdentifier
-                        user = locationDbContext.Users.FirstOrDefault(s => s.UserIdentifier == userId);
-                        if (user != null)
+                        if (stream != null)
                         {
+                            stream.Position = 0;
+                            var data = GetLocationHistoryDataFromZipStream(stream);
+
+                            logger.LogInformation("Processing location data.");
+                            await userLocationsService.CreateUserLocationsAsync(user.UserIdentifier, user.Phone, data);
+
+                            logger.LogInformation("Getting user info from DB.");
                             user.Status = Status.Done;
                         }
-                    }
-                    else
-                    {
-                        logger.LogWarning("No data downloaded from Azure Blob Storage.");
+                        else
+                        {
+                            logger.LogWarning("No data downloaded from Azure Blob Storage.");
+                        }
                     }
                 }
             }
@@ -103,7 +101,7 @@ namespace LocationHistory.Services
                 {
                     using (var reader = new BinaryReader(entryStream))
                     {
-                        return reader.ReadBytes((int) locationHistoryEntry.Length);
+                        return reader.ReadBytes((int)locationHistoryEntry.Length);
                     }
                 }
             }

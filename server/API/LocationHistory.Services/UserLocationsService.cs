@@ -16,13 +16,13 @@ namespace LocationHistory.Services
             this.logger = logger;
         }
 
-        public Task CreateUserLocationsAsync(string userId, byte[] data)
+        public Task CreateUserLocationsAsync(string userId, string phone, byte[] data)
         {
             logger.LogTrace($"Parsing data in {nameof(GoogleLocationParser)}.");
             var locations = googleLocationParser.Parse(data);
 
             logger.LogTrace($"Uploading data in {nameof(AmazonService)}.");
-            return amazonService.UploadCsvData(userId, locations);
+            return amazonService.UploadCsvData(userId, phone, locations);
         }
     }
 }

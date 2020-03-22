@@ -24,14 +24,14 @@ namespace LocationHistory.Services
             this.logger = logger;
         }
 
-        public async Task UploadCsvData(string userId, IEnumerable<Locations> locations)
+        public async Task UploadCsvData(string userId, string phone, IEnumerable<Locations> locations)
         {
             try
             {
                 logger.LogInformation("Start: Upload csv for {UserId}", userId);
                 using (var client = new AmazonS3Client(amazonOptions.Value.Key, amazonOptions.Value.Secret, RegionEndpoint.EUCentral1))
                 {
-                    var csvData = ConvertToCsv(userId, locations);
+                    var csvData = ConvertToCsv(phone, locations);
                     var uploadRequest = new TransferUtilityUploadRequest
                     {
                         InputStream = GenerateStream(csvData),
@@ -151,14 +151,14 @@ namespace LocationHistory.Services
 
 
 
-        private static string ConvertToCsv(string userId, IEnumerable<Locations> locations)
+        private static string ConvertToCsv(string phone, IEnumerable<Locations> locations)
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine("id,date,longitude,latitude,accuracy");
 
             foreach (var location in locations)
             {
-                stringBuilder.AppendLine($"{userId},{location.DateTimeUtc},{location.Longitude},{location.Latitude},{location.Accuracy}");
+                stringBuilder.AppendLine($"{phone},{location.DateTimeUtc},{location.Longitude},{location.Latitude},{location.Accuracy}");
             }
             return stringBuilder.ToString();
         }
