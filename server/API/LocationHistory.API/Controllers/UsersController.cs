@@ -67,7 +67,7 @@ namespace LocationHistory.API.Controllers
 
             userSmSTreshhold.TryGetValue(phoneNumber, out var smsCount);
           
-            if (smsCount >= 3 || phoneNumber.IsValidPhone())
+            if (smsCount >= 3 || !phoneNumber.IsValidPhone())
             {
                 return BadRequest();
             }
