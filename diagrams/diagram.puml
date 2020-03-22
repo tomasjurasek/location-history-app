@@ -1,0 +1,31 @@
+@startuml Basic Sample
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Container.puml
+
+Person(user, "User")
+System_Boundary(c1, "Location History") {
+    Container(web_api, "API","ASP.NET Core", "Verify users and save imported Google History file.")
+    Container(web_client, "Web Client", "Static Vue.js client")
+    Container(service_bus, "Messaging Platform", "Service Bus")
+    Container(serverless, "File Parser Function", "Azure Function", "Function parse imported Google History file and import data into Amazon S3 storage.")
+    Container(storage, "Storage", "Azure Storage")
+    ContainerDb(db, "DB", "Azure SQL")
+}
+
+System_Ext(sms, "SMS Provider")
+System_Ext(amazon, "Amazon S3")
+
+Rel(user, web_client, "Uses")
+Rel(web_client,web_api, "Uses")
+
+Rel(web_api,db, "Store data")
+Rel(web_api,sms, "Send SMS", "Verify SMS")
+Rel(web_api,storage, "Save", "Imported file")
+Rel(web_api,service_bus, "Create", "File imported message")
+Rel(web_api,amazon, "Read", "Parsed data")
+
+Rel_U(serverless,db, "Store data")
+Rel_U(serverless,amazon, "Import", "Parsed data")
+Rel_U(serverless,storage, "Read", "Imported file")
+Rel_U(serverless,service_bus, "Read", "File imported message")
+
+@enduml
