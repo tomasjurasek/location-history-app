@@ -154,11 +154,11 @@ namespace LocationHistory.Services
         private static string ConvertToCsv(string phone, IEnumerable<Locations> locations)
         {
             var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("id,date,longitude,latitude,accuracy");
+            stringBuilder.AppendLine("id,date,longitude,latitude,accuracy,createdDateUtc");
 
             foreach (var location in locations)
             {
-                stringBuilder.AppendLine($"{phone},{location.DateTimeUtc},{location.Longitude},{location.Latitude},{location.Accuracy}");
+                stringBuilder.AppendLine($"{phone},{location.DateTimeUtc},{location.Longitude},{location.Latitude},{location.Accuracy},{DateTime.UtcNow}");
             }
             return stringBuilder.ToString();
         }
