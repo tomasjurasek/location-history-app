@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using LocationHistory.API.Extensions;
 using LocationHistory.API.Models;
 using LocationHistory.Database;
 using LocationHistory.Services;
@@ -27,16 +28,17 @@ namespace LocationHistory.API.Controllers
         private readonly LocationCreatedSender locationCreatedSender;
         private readonly LocationDbContext locationDbContext;
         private readonly AmazonService amazonService;
+        private readonly IHttpClientFactory httpClientFactory;
 
-        protected ConcurrentDictionary<string, int> userSmSTreshhold { get; set; } = new ConcurrentDictionary<string, int>();
+        public static ConcurrentDictionary<string, int> userSmSTreshhold { get; set; } = new ConcurrentDictionary<string, int>();
 
         public UsersController(ILogger<UsersController> logger,
             IConfiguration config,
             AzureBlobService azureBlobService,
             LocationCreatedSender locationCreatedSender,
             LocationDbContext locationDbContext,
-            AmazonService amazonService
-            )
+            AmazonService amazonService,
+            IHttpClientFactory httpClientFactory)
         {
             this.logger = logger;
             this.config = config;
@@ -44,6 +46,7 @@ namespace LocationHistory.API.Controllers
             this.locationCreatedSender = locationCreatedSender;
             this.locationDbContext = locationDbContext;
             this.amazonService = amazonService;
+            this.httpClientFactory = httpClientFactory;
         }
 
         [HttpGet("{userId}/verify")]
@@ -63,26 +66,30 @@ namespace LocationHistory.API.Controllers
         {
 
             userSmSTreshhold.TryGetValue(phoneNumber, out var smsCount);
-
-            if (smsCount >= 3)
+          
+            if (smsCount >= 3 || phoneNumber.IsValidPhone())
             {
                 return BadRequest();
             }
+
             var userId = $"{RandomString(3)}-{RandomString(3)}-{RandomString(3)}";
             var token = Guid.NewGuid();
-            var client = new HttpClient();
             var verifyCode = RandomString(5);
+
+            var client = httpClientFactory.CreateClient();
+           
             var smsToken = config.GetValue<string>("SmsToken");
             var smsUrl = config.GetValue<string>("SmsUrl");
+
             var url = string.Format(smsUrl, smsToken, phoneNumber, verifyCode);
             var response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                locationDbContext.Users.Add(new global::LocationHistory.Database.Entities.User
+                locationDbContext.Users.Add(new Database.Entities.User
                 {
-                    Status = global::LocationHistory.Database.Entities.Status.InProgress,
+                    Status = Database.Entities.Status.InProgress,
                     Token = token.ToString(),
-                    Phone = phoneNumber,
+                    Phone = phoneNumber.GetPhone(),
                     UserIdentifier = userId,
                     VerifyCode = verifyCode,
                     CreatedDateTime = DateTime.UtcNow
@@ -125,7 +132,7 @@ namespace LocationHistory.API.Controllers
                     return locations;
                 }
 
-                if (user.Status == global::LocationHistory.Database.Entities.Status.InProgress)
+                if (user.Status == Database.Entities.Status.InProgress)
                 {
                     return NoContent();
                 }
