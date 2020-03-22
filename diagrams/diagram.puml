@@ -3,10 +3,10 @@
 
 Person(user, "User")
 System_Boundary(c1, "Location History") {
-    Container(web_api, "API","ASP.NET Core", "The API verify users and save the imported Google History file.")
+    Container(web_api, "API","ASP.NET Core", "Verify users and save an imported Google History file.")
     Container(web_client, "Web Client", "Static Vue.js client")
     Container(service_bus, "Messaging Platform", "Service Bus")
-    Container(serverless, "File Parser Function", "Azure Function", "The function parse imported Google History file and import data into Amazon S3 storage.")
+    Container(serverless, "File Parser Function", "Azure Function", "Parse an imported Google History file and import data into Amazon S3 storage.")
     Container(storage, "Storage", "Azure Storage")
     ContainerDb(db, "DB", "Azure SQL")
 }
@@ -20,12 +20,12 @@ Rel(web_client,web_api, "Uses")
 Rel(web_api,db, "Store data")
 Rel(web_api,sms, "Send SMS", "Verify SMS")
 Rel(web_api,storage, "Save", "Imported file")
-Rel(web_api,service_bus, "Create", "File imported message")
+Rel(web_api,service_bus, "Send", "File imported message")
 Rel(web_api,amazon, "Read", "Parsed data")
 
 Rel_U(serverless,db, "Store data")
 Rel_U(serverless,amazon, "Import", "Parsed data")
 Rel_U(serverless,storage, "Read", "Imported file")
-Rel_U(serverless,service_bus, "Read", "File imported message")
+Rel_U(serverless,service_bus, "Receive", "File imported message")
 
 @enduml
