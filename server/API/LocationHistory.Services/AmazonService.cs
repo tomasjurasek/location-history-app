@@ -156,9 +156,11 @@ namespace LocationHistory.Services
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine("id,date,longitude,latitude,accuracy,createdDateUtc");
 
+            var createdDateTimeUtc = DateTime.UtcNow;
+
             foreach (var location in locations)
             {
-                stringBuilder.AppendLine($"{phone},{location.DateTimeUtc},{location.Longitude},{location.Latitude},{location.Accuracy},{DateTime.UtcNow}");
+                stringBuilder.AppendLine($"{phone},{location.DateTimeUtc},{location.Longitude},{location.Latitude},{location.Accuracy},{createdDateTimeUtc}");
             }
             return stringBuilder.ToString();
         }
