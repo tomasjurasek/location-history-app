@@ -40,11 +40,11 @@ namespace LocationHistory.Services
                 });
             }
 
-            var threeWeeksAgo = DateTime.UtcNow.AddDays(-21);
+            var monthsAgo = DateTime.UtcNow.AddMonths(-1);
 
-            logger.LogTrace($"Filtering locations (>= {threeWeeksAgo}).");
+            logger.LogTrace($"Filtering locations (>= {monthsAgo}).");
             return response
-                .Where(s => s.DateTimeUtc >= threeWeeksAgo)
+                .Where(s => s.DateTimeUtc >= monthsAgo)
                 .OrderBy(s => s.DateTimeUtc);
         }
     }
