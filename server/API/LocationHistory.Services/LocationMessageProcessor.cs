@@ -69,10 +69,17 @@ namespace LocationHistory.Services
             }
             finally
             {
+                if (user != null)
+                {
+                    user.Phone = null;
+                    user.VerifyCode = null;
+                }
+
                 logger.LogInformation("Deleting file from Azure Blob Storage for user {UserId}", userId);
                 await azureBlobService.DeleteFile(userId);
 
                 logger.LogInformation("Saving user info int DB for user {UserId}", userId);
+              
                 await locationDbContext.SaveChangesAsync(cancellationToken);
             }
         }

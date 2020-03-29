@@ -1,3 +1,4 @@
+using LocationHistory.API.Services;
 using LocationHistory.Database;
 using LocationHistory.Services.Extensions;
 using LocationHistory.Services.Options;
@@ -44,8 +45,7 @@ namespace LocationHistory.API
                 options.UseSqlServer(Configuration.GetConnectionString("Database"));
             });
 
-            // comment if Azure Function is used to process the message instead of FileParseBackgroundService
-            //services.AddHostedService<FileParseBackgroundService>();
+            services.AddHostedService<DeleteUsersBackgroundService>();
             services.Configure<AmazonOptions>(Configuration.GetSection("Amazon"));
             services.Configure<AzureBlobServiceOptions>(Configuration.GetSection("Azure"));
             services.Configure<AzureServiceBusOptions>(Configuration.GetSection("Azure"));
