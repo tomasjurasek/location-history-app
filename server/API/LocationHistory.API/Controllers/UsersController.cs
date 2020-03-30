@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 using LocationHistory.API.Extensions;
 using LocationHistory.API.Models;
 using LocationHistory.Database;
@@ -80,8 +81,9 @@ namespace LocationHistory.API.Controllers
            
             var smsToken = config.GetValue<string>("SmsToken");
             var smsUrl = config.GetValue<string>("SmsUrl");
+            var encodedText = HttpUtility.UrlEncode($"(Poloha pro hygienu) potvrzovaci kod: {verifyCode}");
+            var url = string.Format(smsUrl, smsToken, phoneNumber, encodedText);
 
-            var url = string.Format(smsUrl, smsToken, phoneNumber, verifyCode);
             var response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
