@@ -7,7 +7,6 @@ namespace LocationHistory.API.Extensions
 {
     public static class StringExtensions
     {
-
         public static bool IsValidPhone(this string phone)
         {
             return phone?.Length == 9 || phone?.Length == 12;

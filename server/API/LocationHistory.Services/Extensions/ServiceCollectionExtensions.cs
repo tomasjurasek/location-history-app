@@ -1,4 +1,5 @@
-﻿using LocationHistory.Services.ServiceBus;
+﻿using LocationHistory.Services.BlobStorage;
+using LocationHistory.Services.ServiceBus;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LocationHistory.Services.Extensions
@@ -10,7 +11,6 @@ namespace LocationHistory.Services.Extensions
 
             services.AddSingleton<GoogleLocationParser>();
             services.AddSingleton<UserLocationsService>();
-            services.AddSingleton<AmazonService>();
             services.AddSingleton<LocationCreatedSender>();
             services.AddSingleton<LocationCreatedReceiver>();
             services.AddSingleton<AzureBlobLocationFileService>();
