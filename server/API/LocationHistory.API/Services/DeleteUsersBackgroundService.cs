@@ -24,12 +24,13 @@ namespace LocationHistory.API.Services
                 {
                     var context = scope.ServiceProvider.GetRequiredService<LocationDbContext>();
 
-                    var users = context.Users.Where(s => s.CreatedDateTime <= DateTime.Now.AddDays(-14));
+                    var users = context.Users.Where(s => s.CreatedDateTime <= DateTime.Now.AddDays(-1));
+                    
                     context.Users.RemoveRange(users);
                     await context.SaveChangesAsync();
                 }
 
-                await Task.Delay(TimeSpan.FromHours(6));
+                await Task.Delay(TimeSpan.FromHours(2));
             }
         }
     }
