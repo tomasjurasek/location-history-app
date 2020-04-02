@@ -3,6 +3,7 @@ using LocationHistory.Services.Options;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,7 +46,7 @@ namespace LocationHistory.Services
                         {
                             locations.Add(new Locations
                             {
-                                DateTimeUtc = Convert.ToDateTime(values[1]),
+                                DateTimeUtc = DateTime.ParseExact(values[1], "dd/MM/yyyy H:mm", CultureInfo.InvariantCulture),
                                 Longitude = int.Parse(values[2]),
                                 Latitude = int.Parse(values[3]),
                                 Accuracy = int.Parse(values[4])
