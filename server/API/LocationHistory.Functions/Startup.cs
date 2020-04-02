@@ -24,9 +24,10 @@ namespace LocationHistory.Functions
             builder.Services.AddLogging();
             builder.Services.AddTransient<LocationMessageProcessor>();
             builder.Services.AddTransient<UserLocationsService>();
-            builder.Services.AddTransient<AzureBlobService>();
+            builder.Services.AddTransient<AzureBlobLocationFileService>();
             builder.Services.AddTransient<GoogleLocationParser>();
             builder.Services.AddTransient<AmazonService>();
+            builder.Services.AddTransient<AzureBlobLocationDataFileService>();
 
             builder.Services.AddOptions<AmazonOptions>()
                 .Configure<IConfiguration>((settings, configuration) =>

@@ -8,21 +8,26 @@ namespace LocationHistory.Services
         private readonly GoogleLocationParser googleLocationParser;
         private readonly AmazonService amazonService;
         private readonly ILogger<UserLocationsService> logger;
+        private readonly AzureBlobLocationDataFileService azureBlobLocationDataFileService;
 
-        public UserLocationsService(GoogleLocationParser googleLocationParser, AmazonService amazonService, ILogger<UserLocationsService> logger)
+        public UserLocationsService(GoogleLocationParser googleLocationParser, AmazonService amazonService, ILogger<UserLocationsService> logger, AzureBlobLocationDataFileService azureBlobLocationDataFileService)
         {
             this.googleLocationParser = googleLocationParser;
             this.amazonService = amazonService;
             this.logger = logger;
+            this.azureBlobLocationDataFileService = azureBlobLocationDataFileService;
         }
 
-        public Task CreateUserLocationsAsync(string userId, string phone, byte[] data)
+        public async Task CreateUserLocationsAsync(string userId, string phone, byte[] data)
         {
             logger.LogTrace($"Parsing data in {nameof(GoogleLocationParser)}.");
             var locations = googleLocationParser.Parse(data);
 
+            await azureBlobLocationDataFileService.UploadCsvData(userId, phone, locations);
+
             logger.LogTrace($"Uploading data in {nameof(AmazonService)}.");
-            return amazonService.UploadCsvData(userId, phone, locations);
+            //await amazonService.UploadCsvData(userId, phone, locations);
+
         }
     }
 }

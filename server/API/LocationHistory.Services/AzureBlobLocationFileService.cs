@@ -6,11 +6,11 @@ using Microsoft.Extensions.Options;
 
 namespace LocationHistory.Services
 {
-    public class AzureBlobService
+    public class AzureBlobLocationFileService
     {
         private BlobContainerClient containerClient;
 
-        public AzureBlobService(IOptions<AzureBlobServiceOptions> options)
+        public AzureBlobLocationFileService(IOptions<AzureBlobServiceOptions> options)
         {
             var storageConnectionString = options.Value.StorageAccount;
             BlobServiceClient blobServiceClient = new BlobServiceClient(storageConnectionString);

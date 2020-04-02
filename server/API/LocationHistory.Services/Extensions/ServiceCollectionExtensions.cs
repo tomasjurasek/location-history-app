@@ -13,7 +13,8 @@ namespace LocationHistory.Services.Extensions
             services.AddSingleton<AmazonService>();
             services.AddSingleton<LocationCreatedSender>();
             services.AddSingleton<LocationCreatedReceiver>();
-            services.AddSingleton<AzureBlobService>();
+            services.AddSingleton<AzureBlobLocationFileService>();
+            services.AddSingleton<AzureBlobLocationDataFileService>();
 
             return services;
         }

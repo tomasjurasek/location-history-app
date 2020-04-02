@@ -16,12 +16,12 @@ namespace LocationHistory.Services
     {
         private readonly ILogger<LocationMessageProcessor> logger;
         private readonly UserLocationsService userLocationsService;
-        private readonly AzureBlobService azureBlobService;
+        private readonly AzureBlobLocationFileService azureBlobService;
         private readonly LocationDbContext locationDbContext;
 
         public LocationMessageProcessor(ILogger<LocationMessageProcessor> logger,
             UserLocationsService userLocationsService,
-            AzureBlobService azureBlobService,
+            AzureBlobLocationFileService azureBlobService,
             LocationDbContext locationDbContext)
         {
             this.logger = logger;
