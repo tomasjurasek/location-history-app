@@ -11,12 +11,12 @@ namespace LocationHistory.Services.ServiceBus
     public class LocationCreatedReceiver : ServiceBusReceiver
     {
         private readonly UserLocationsService userLocationsService;
-        private readonly AzureBlobService azureBlobService;
+        private readonly AzureBlobLocationFileService azureBlobService;
         private readonly IServiceScopeFactory serviceScopeFactory;
         private readonly ILoggerFactory loggerFactory;
 
         public LocationCreatedReceiver(IOptions<AzureServiceBusOptions> options, ILogger<ServiceBusReceiver> logger,
-            UserLocationsService userLocationsService, AzureBlobService azureBlobService, IServiceScopeFactory serviceScopeFactory,
+            UserLocationsService userLocationsService, AzureBlobLocationFileService azureBlobService, IServiceScopeFactory serviceScopeFactory,
             ILoggerFactory loggerFactory) : base(options, logger)
         {
             this.userLocationsService = userLocationsService;

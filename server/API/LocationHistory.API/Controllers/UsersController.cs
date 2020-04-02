@@ -25,7 +25,8 @@ namespace LocationHistory.API.Controllers
     {
         private readonly ILogger<UsersController> logger;
         private readonly IConfiguration config;
-        private readonly AzureBlobService azureBlobService;
+        private readonly AzureBlobLocationFileService azureBlobService;
+        private readonly AzureBlobLocationDataFileService azureBlobLocationDataFileService;
         private readonly LocationCreatedSender locationCreatedSender;
         private readonly LocationDbContext locationDbContext;
         private readonly AmazonService amazonService;
@@ -35,7 +36,8 @@ namespace LocationHistory.API.Controllers
 
         public UsersController(ILogger<UsersController> logger,
             IConfiguration config,
-            AzureBlobService azureBlobService,
+            AzureBlobLocationFileService azureBlobService,
+            AzureBlobLocationDataFileService azureBlobLocationDataFileService,
             LocationCreatedSender locationCreatedSender,
             LocationDbContext locationDbContext,
             AmazonService amazonService,
@@ -44,6 +46,7 @@ namespace LocationHistory.API.Controllers
             this.logger = logger;
             this.config = config;
             this.azureBlobService = azureBlobService;
+            this.azureBlobLocationDataFileService = azureBlobLocationDataFileService;
             this.locationCreatedSender = locationCreatedSender;
             this.locationDbContext = locationDbContext;
             this.amazonService = amazonService;
@@ -119,7 +122,7 @@ namespace LocationHistory.API.Controllers
             if (user != null)
             {
                 var locations = new List<LocationViewModel>();
-                var data = await amazonService.GetLocations(userId);
+                var data = await azureBlobLocationDataFileService.GetLocations(userId);
 
                 locations.AddRange(data.Select(s => new LocationViewModel
                 {
