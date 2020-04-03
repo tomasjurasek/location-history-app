@@ -32,9 +32,9 @@ namespace LocationHistory.Services.BlobStorage
             return stream;
         }
 
-        public async Task Delete(string userId)
+        public async Task<bool> Delete(string userId)
         {
-            await containerClient.DeleteBlobIfExistsAsync($"{userId}.zip");
+            return await containerClient.DeleteBlobIfExistsAsync($"{userId}.zip");
         }
     }
 }

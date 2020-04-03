@@ -44,7 +44,6 @@ namespace LocationHistory.Services
                     {
                         if (stream != null)
                         {
-                            stream.Position = 0;
                             var data = GetLocationHistoryDataFromZipStream(stream);
 
                             logger.LogInformation("Processing location data.");
@@ -80,7 +79,6 @@ namespace LocationHistory.Services
                 await azureBlobService.Delete(userId);
 
                 logger.LogInformation("Saving user info int DB for user {UserId}", userId);
-              
                 await locationDbContext.SaveChangesAsync(cancellationToken);
             }
         }

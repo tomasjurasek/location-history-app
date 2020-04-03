@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
+using LocationHistory.Database;
 using LocationHistory.Services.BlobStorage;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace LocationHistory.Services
@@ -14,16 +16,19 @@ namespace LocationHistory.Services
         private readonly ILogger<UserLocationsService> logger;
         private readonly AzureBlobLocationDataFileService azureBlobLocationDataFileService;
         private readonly AzureBlobLocationFileService azureBlobLocationFileService;
+        private readonly LocationDbContext locationDbContext;
 
         public UserLocationsService(GoogleLocationParser googleLocationParser,
             ILogger<UserLocationsService> logger,
             AzureBlobLocationDataFileService azureBlobLocationDataFileService,
-            AzureBlobLocationFileService azureBlobLocationFileService)
+            AzureBlobLocationFileService azureBlobLocationFileService,
+            LocationDbContext locationDbContext)
         {
             this.googleLocationParser = googleLocationParser;
             this.logger = logger;
             this.azureBlobLocationDataFileService = azureBlobLocationDataFileService;
             this.azureBlobLocationFileService = azureBlobLocationFileService;
+            this.locationDbContext = locationDbContext;
         }
 
         public async Task CreateUserLocationsAsync(string userId, string phone, byte[] data)
@@ -55,7 +60,6 @@ namespace LocationHistory.Services
                     }
                     line = await reader.ReadLineAsync();
                 }
-
             }
 
             return locations;
@@ -64,10 +68,15 @@ namespace LocationHistory.Services
 
         public async Task<bool> DeleteUserData(string userId)
         {
-            await azureBlobLocationDataFileService.Delete(userId);
-            await azureBlobLocationFileService.Delete(userId);
+            var isLocationDataFileDeleted = await azureBlobLocationDataFileService.Delete(userId);
+            var isLocationFoleDeleted = await azureBlobLocationFileService.Delete(userId);
 
-            return true;
+            if (isLocationDataFileDeleted && isLocationFoleDeleted)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

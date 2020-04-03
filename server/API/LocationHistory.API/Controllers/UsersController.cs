@@ -153,9 +153,12 @@ namespace LocationHistory.API.Controllers
             var user = await locationDbContext.Users.FirstOrDefaultAsync(s => s.UserIdentifier == userId && s.Token == token);
             if (user != null)
             {
-                var result = await azureBlobLocationDataFileService.Delete(userId);
+                var result = await userLocationsService.DeleteUserData(userId);
                 if (result)
                 {
+                    locationDbContext.Users.Remove(user);
+                    await locationDbContext.SaveChangesAsync();
+
                     return Ok();
                 }
                 return BadRequest();
