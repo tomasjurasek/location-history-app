@@ -29,12 +29,6 @@ namespace LocationHistory.Functions
             builder.Services.AddTransient<GoogleLocationParser>();
             builder.Services.AddTransient<AzureBlobLocationDataFileService>();
 
-            builder.Services.AddOptions<AmazonOptions>()
-                .Configure<IConfiguration>((settings, configuration) =>
-                {
-                    configuration.GetSection("Amazon").Bind(settings);
-                });
-
             builder.Services.AddOptions<AzureBlobServiceOptions>()
                 .Configure<IConfiguration>((settings, configuration) =>
                 {

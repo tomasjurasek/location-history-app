@@ -46,7 +46,6 @@ namespace LocationHistory.API
             });
 
             services.AddHostedService<DeleteUsersBackgroundService>();
-            services.Configure<AmazonOptions>(Configuration.GetSection("Amazon"));
             services.Configure<AzureBlobServiceOptions>(Configuration.GetSection("Azure"));
             services.Configure<AzureServiceBusOptions>(Configuration.GetSection("Azure"));
             services.AddSwaggerGen(c =>

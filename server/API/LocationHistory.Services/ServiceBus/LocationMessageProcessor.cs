@@ -11,7 +11,7 @@ using LocationHistory.Services.BlobStorage;
 using LocationHistory.Services.ServiceBus;
 using Microsoft.Extensions.Logging;
 
-namespace LocationHistory.Services
+namespace LocationHistory.Services.ServiceBus
 {
     public class LocationMessageProcessor
     {
