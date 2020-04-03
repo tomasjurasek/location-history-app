@@ -2,6 +2,7 @@
 using LocationHistory.Database;
 using LocationHistory.Functions;
 using LocationHistory.Services;
+using LocationHistory.Services.BlobStorage;
 using LocationHistory.Services.Options;
 using LocationHistory.Services.ServiceBus;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
