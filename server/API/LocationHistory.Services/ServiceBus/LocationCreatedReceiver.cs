@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using LocationHistory.Database;
+using LocationHistory.Services.BlobStorage;
 using LocationHistory.Services.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

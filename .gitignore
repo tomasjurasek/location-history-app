@@ -35,3 +35,5 @@ msbuild.wrn
 .idea
 /server/API/API/Properties/PublishProfiles
 /server/API/GoogleFileParser/local.settings.json
+/server/API/LocationHistory.API/Properties/PublishProfiles
+/server/API/LocationHistory.Functions/Properties/PublishProfiles

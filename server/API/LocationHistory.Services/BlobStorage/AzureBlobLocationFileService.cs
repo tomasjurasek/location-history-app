@@ -4,7 +4,7 @@ using Azure.Storage.Blobs;
 using LocationHistory.Services.Options;
 using Microsoft.Extensions.Options;
 
-namespace LocationHistory.Services
+namespace LocationHistory.Services.BlobStorage
 {
     public class AzureBlobLocationFileService
     {
@@ -16,26 +16,25 @@ namespace LocationHistory.Services
             BlobServiceClient blobServiceClient = new BlobServiceClient(storageConnectionString);
             containerClient = blobServiceClient.GetBlobContainerClient("locationfile");
         }
-        public async Task UploadFile(string userId, Stream stream)
+
+        public async Task Upload(string userId, Stream stream)
         {
             BlobClient blobClient = containerClient.GetBlobClient($"{userId}.zip");
             await blobClient.UploadAsync(stream);
         }
 
-        public async Task<Stream> DownloadFile(string userId)
+        public async Task<Stream> Download(string userId)
         {
             var stream = new MemoryStream();
-
             BlobClient blobClient = containerClient.GetBlobClient($"{userId}.zip");
             await blobClient.DownloadToAsync(stream);
-
+            stream.Position = 0;
             return stream;
-
         }
 
-        public async Task DeleteFile(string userId)
+        public async Task<bool> Delete(string userId)
         {
-            await containerClient.DeleteBlobIfExistsAsync($"{userId}.zip");
+            return await containerClient.DeleteBlobIfExistsAsync($"{userId}.zip");
         }
     }
 }

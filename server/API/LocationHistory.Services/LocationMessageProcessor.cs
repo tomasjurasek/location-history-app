@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using LocationHistory.Database;
 using LocationHistory.Database.Entities;
+using LocationHistory.Services.BlobStorage;
 using LocationHistory.Services.ServiceBus;
 using Microsoft.Extensions.Logging;
 
@@ -39,11 +40,10 @@ namespace LocationHistory.Services
                 if (user != null)
                 {
                     logger.LogInformation("Downloading file from Azure Blob Storage for user {UserId}.", userId);
-                    using (var stream = await azureBlobService.DownloadFile(userId))
+                    using (var stream = await azureBlobService.Download(userId))
                     {
                         if (stream != null)
                         {
-                            stream.Position = 0;
                             var data = GetLocationHistoryDataFromZipStream(stream);
 
                             logger.LogInformation("Processing location data.");
@@ -76,10 +76,9 @@ namespace LocationHistory.Services
                 }
 
                 logger.LogInformation("Deleting file from Azure Blob Storage for user {UserId}", userId);
-                await azureBlobService.DeleteFile(userId);
+                await azureBlobService.Delete(userId);
 
                 logger.LogInformation("Saving user info int DB for user {UserId}", userId);
-              
                 await locationDbContext.SaveChangesAsync(cancellationToken);
             }
         }

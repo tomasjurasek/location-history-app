@@ -10,6 +10,7 @@ using LocationHistory.API.Extensions;
 using LocationHistory.API.Models;
 using LocationHistory.Database;
 using LocationHistory.Services;
+using LocationHistory.Services.BlobStorage;
 using LocationHistory.Services.ServiceBus;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,8 +30,8 @@ namespace LocationHistory.API.Controllers
         private readonly AzureBlobLocationDataFileService azureBlobLocationDataFileService;
         private readonly LocationCreatedSender locationCreatedSender;
         private readonly LocationDbContext locationDbContext;
-        private readonly AmazonService amazonService;
         private readonly IHttpClientFactory httpClientFactory;
+        private readonly UserLocationsService userLocationsService;
 
         public static ConcurrentDictionary<string, int> userSmSTreshhold { get; set; } = new ConcurrentDictionary<string, int>();
 
@@ -40,8 +41,8 @@ namespace LocationHistory.API.Controllers
             AzureBlobLocationDataFileService azureBlobLocationDataFileService,
             LocationCreatedSender locationCreatedSender,
             LocationDbContext locationDbContext,
-            AmazonService amazonService,
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory,
+            UserLocationsService userLocationsService)
         {
             this.logger = logger;
             this.config = config;
@@ -49,8 +50,8 @@ namespace LocationHistory.API.Controllers
             this.azureBlobLocationDataFileService = azureBlobLocationDataFileService;
             this.locationCreatedSender = locationCreatedSender;
             this.locationDbContext = locationDbContext;
-            this.amazonService = amazonService;
             this.httpClientFactory = httpClientFactory;
+            this.userLocationsService = userLocationsService;
         }
 
         [HttpGet("{userId}/verify")]
@@ -122,7 +123,7 @@ namespace LocationHistory.API.Controllers
             if (user != null)
             {
                 var locations = new List<LocationViewModel>();
-                var data = await azureBlobLocationDataFileService.GetLocations(userId);
+                var data = await userLocationsService.GetLocations(userId);
 
                 locations.AddRange(data.Select(s => new LocationViewModel
                 {
@@ -152,9 +153,12 @@ namespace LocationHistory.API.Controllers
             var user = await locationDbContext.Users.FirstOrDefaultAsync(s => s.UserIdentifier == userId && s.Token == token);
             if (user != null)
             {
-                var result = await amazonService.Delete(userId);
+                var result = await userLocationsService.DeleteUserData(userId);
                 if (result)
                 {
+                    locationDbContext.Users.Remove(user);
+                    await locationDbContext.SaveChangesAsync();
+
                     return Ok();
                 }
                 return BadRequest();
@@ -216,7 +220,7 @@ namespace LocationHistory.API.Controllers
                     {
                         await file.CopyToAsync(stream);
                         stream.Position = 0;
-                        await azureBlobService.UploadFile(userId, stream);
+                        await azureBlobService.Upload(userId, stream);
                         await locationCreatedSender.SendMessageAsync(new LocationsCreatedMessage
                         {
                             UserId = userId
