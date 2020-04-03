@@ -10,9 +10,9 @@ namespace LocationHistory.Services.Extensions
         {
 
             services.AddSingleton<GoogleLocationParser>();
-            services.AddSingleton<UserLocationsService>();
-            services.AddSingleton<LocationCreatedSender>();
-            services.AddSingleton<LocationCreatedReceiver>();
+            services.AddTransient<UserLocationsService>();
+            services.AddTransient<LocationCreatedSender>();
+            services.AddTransient<LocationCreatedReceiver>();
             services.AddSingleton<AzureBlobLocationFileService>();
             services.AddSingleton<AzureBlobLocationDataFileService>();
 
