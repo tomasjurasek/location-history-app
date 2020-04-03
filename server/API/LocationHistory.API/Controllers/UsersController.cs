@@ -71,7 +71,7 @@ namespace LocationHistory.API.Controllers
         {
 
             userSmSTreshhold.TryGetValue(phoneNumber, out var smsCount);
-          
+
             if (smsCount >= 3 || !phoneNumber.IsValidPhone())
             {
                 return BadRequest();
@@ -82,7 +82,7 @@ namespace LocationHistory.API.Controllers
             var verifyCode = RandomString(5);
 
             var client = httpClientFactory.CreateClient();
-           
+
             var smsToken = config.GetValue<string>("SmsToken");
             var smsUrl = config.GetValue<string>("SmsUrl");
             var encodedText = HttpUtility.UrlEncode($"(Poloha pro hygienu) potvrzovaci kod: {verifyCode}");
@@ -153,15 +153,12 @@ namespace LocationHistory.API.Controllers
             var user = await locationDbContext.Users.FirstOrDefaultAsync(s => s.UserIdentifier == userId && s.Token == token);
             if (user != null)
             {
-                var result = await userLocationsService.DeleteUserData(userId);
-                if (result)
-                {
-                    locationDbContext.Users.Remove(user);
-                    await locationDbContext.SaveChangesAsync();
+                await userLocationsService.DeleteUserData(userId);
 
-                    return Ok();
-                }
-                return BadRequest();
+                locationDbContext.Users.Remove(user);
+                await locationDbContext.SaveChangesAsync();
+
+                return Ok();
             }
 
             return NotFound();

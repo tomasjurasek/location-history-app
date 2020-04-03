@@ -66,17 +66,10 @@ namespace LocationHistory.Services
         }
 
 
-        public async Task<bool> DeleteUserData(string userId)
+        public async Task DeleteUserData(string userId)
         {
-            var isLocationDataFileDeleted = await azureBlobLocationDataFileService.Delete(userId);
-            var isLocationFoleDeleted = await azureBlobLocationFileService.Delete(userId);
-
-            if (isLocationDataFileDeleted && isLocationFoleDeleted)
-            {
-                return true;
-            }
-
-            return false;
+            await azureBlobLocationDataFileService.Delete(userId);
+            await azureBlobLocationFileService.Delete(userId);
         }
     }
 }
