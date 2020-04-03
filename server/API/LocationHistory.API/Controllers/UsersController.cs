@@ -164,26 +164,6 @@ namespace LocationHistory.API.Controllers
             return NotFound();
         }
 
-        public class KebolaDataRoot
-        {
-            [JsonProperty("rows")]
-            public KebolaDataRow[][] Rows { get; set; }
-            [JsonProperty("columns")]
-            public string[] Columns { get; set; }
-        }
-
-        public class KebolaDataRow
-        {
-            [JsonProperty("columnName")]
-            public string ColumnName { get; set; }
-
-            [JsonProperty("value")]
-            public string Value { get; set; }
-
-            [JsonProperty("isTruncated")]
-            public bool IsTruncated { get; set; }
-        }
-
         [HttpPost("{userId}/file")]
         [RequestSizeLimit(104857600)]
         [RequestFormLimits(MultipartBodyLengthLimit = 104857600)]
@@ -253,7 +233,6 @@ namespace LocationHistory.API.Controllers
             {
                 throw new Exception("Missing configuration of 'MaxUploadedFileLength'.");
             }
-
 
             return file.Length <= maxMaxUploadedFileLength;
         }
