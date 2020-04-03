@@ -1,5 +1,7 @@
-﻿using Azure.Storage.Blobs;
+﻿using Amazon.Runtime.Internal.Util;
+using Azure.Storage.Blobs;
 using LocationHistory.Services.Options;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -12,8 +14,11 @@ namespace LocationHistory.Services.BlobStorage
 {
     public class AzureBlobLocationDataFileService : AzureBlobStorageBase
     {
-        public AzureBlobLocationDataFileService(IOptions<AzureBlobServiceOptions> options) : base(options.Value.StorageAccount, "locationdatafile")
+        private readonly ILogger<AzureBlobLocationDataFileService> logger;
+
+        public AzureBlobLocationDataFileService(IOptions<AzureBlobServiceOptions> options, ILogger<AzureBlobLocationDataFileService> logger) : base(options.Value.StorageAccount, "locationdatafile")
         {
+            this.logger = logger;
         }
 
         public async Task UploadCsvData(string userId, string phone, IEnumerable<Locations> locations)
@@ -25,10 +30,18 @@ namespace LocationHistory.Services.BlobStorage
 
         public async Task<Stream> Download(string userId)
         {
-            BlobClient blobClient = containerClient.GetBlobClient($"{userId}.csv");
             var stream = new MemoryStream();
-            await blobClient.DownloadToAsync(stream);
-            stream.Position = 0;
+            try
+            {
+                BlobClient blobClient = containerClient.GetBlobClient($"{userId}.csv");
+                await blobClient.DownloadToAsync(stream);
+                stream.Position = 0;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Download CSV file failed");
+            }
+          
             return stream;
         }
 
