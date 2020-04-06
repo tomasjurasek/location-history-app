@@ -13,12 +13,10 @@ namespace LocationHistory.API.Services
     public class DeleteUsersBackgroundService : BackgroundService
     {
         private readonly IServiceScopeFactory serviceScopeFactory;
-        private readonly UserLocationsService userLocationsService;
 
-        public DeleteUsersBackgroundService(IServiceScopeFactory serviceScopeFactory, UserLocationsService userLocationsService)
+        public DeleteUsersBackgroundService(IServiceScopeFactory serviceScopeFactory)
         {
             this.serviceScopeFactory = serviceScopeFactory;
-            this.userLocationsService = userLocationsService;
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -27,7 +25,7 @@ namespace LocationHistory.API.Services
                 using (var scope = serviceScopeFactory.CreateScope())
                 {
                     var context = scope.ServiceProvider.GetRequiredService<LocationDbContext>();
-
+                    var userLocationsService = scope.ServiceProvider.GetRequiredService<UserLocationsService>();
                     var users = context.Users.Where(s => s.CreatedDateTime <= DateTime.Now.AddHours(-8));
 
                     foreach (var user in users)
