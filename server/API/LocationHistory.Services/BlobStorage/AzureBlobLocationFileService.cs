@@ -1,20 +1,21 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using Amazon.Runtime.Internal.Util;
 using Azure.Storage.Blobs;
 using LocationHistory.Services.Options;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace LocationHistory.Services.BlobStorage
 {
-    public class AzureBlobLocationFileService
+    public class AzureBlobLocationFileService : AzureBlobStorageBase
     {
-        private BlobContainerClient containerClient;
+        private readonly ILogger<AzureBlobLocationFileService> logger;
+        private const string QUEUE_NAME = "locationfile";
 
-        public AzureBlobLocationFileService(IOptions<AzureBlobServiceOptions> options)
+        public AzureBlobLocationFileService(IOptions<AzureBlobServiceOptions> options, ILogger<AzureBlobLocationFileService> logger) : base(options.Value.StorageAccount, QUEUE_NAME)
         {
-            var storageConnectionString = options.Value.StorageAccount;
-            BlobServiceClient blobServiceClient = new BlobServiceClient(storageConnectionString);
-            containerClient = blobServiceClient.GetBlobContainerClient("locationfile");
+            this.logger = logger;
         }
 
         public async Task Upload(string userId, Stream stream)
@@ -26,9 +27,18 @@ namespace LocationHistory.Services.BlobStorage
         public async Task<Stream> Download(string userId)
         {
             var stream = new MemoryStream();
-            BlobClient blobClient = containerClient.GetBlobClient($"{userId}.zip");
-            await blobClient.DownloadToAsync(stream);
-            stream.Position = 0;
+            try
+            {
+                BlobClient blobClient = containerClient.GetBlobClient($"{userId}.zip");
+                await blobClient.DownloadToAsync(stream);
+                stream.Position = 0;
+               
+            }
+            catch (System.Exception ex)
+            {
+                logger.LogWarning(ex, "Download CSV file failed");
+            }
+
             return stream;
         }
 
